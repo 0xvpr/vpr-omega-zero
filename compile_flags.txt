@@ -1,0 +1,8 @@
+-std=c++2a
+-IInclude
+-Wall
+-Wextra
+-Werror
+-Wshadow
+-Wpedantic
+-Wconversion
