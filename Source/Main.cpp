@@ -32,7 +32,7 @@ static int DetermineFiletype(std::ifstream& ifs) {
         char cbuffer[4]{0};
         
         ifs.read(cbuffer, sizeof(cbuffer));
-        std::string buffer(cbuffer);
+        const std::string buffer(cbuffer);
 
         if (buffer.starts_with("MZ")) {
             return 1;
@@ -62,10 +62,12 @@ int main(int argc, char** argv) {
     
     int filetype = DetermineFiletype(ifs);
     ifs.close();
+
     switch (filetype)
     {
         case 0:
         {
+            std::cout << "Filetype not supported." << std::endl;
             return -1;
         }
         case 1:
@@ -112,12 +114,13 @@ int main(int argc, char** argv) {
 
             // Calculate total size
             unsigned size = entry_size * n_entries;
-            char* null_bytes = new char[size];
+            auto null_bytes = new char[size];
             memset(null_bytes, 0, size);
 
             // Overwrite total bytes
             fseek(fp, start_offset, SEEK_SET);
             fwrite(null_bytes, size, sizeof(char), fp);
+            delete[] null_bytes;
 
             // Overwrite the pointers section header info
             auto offsets = { 0x20, 0x2e, 0x30, 0x32 };
