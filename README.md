@@ -10,5 +10,5 @@ sudo make install # if you want it available globally
 
 ## Example Usage
 ```bash
-vpr-bin2fmt path/to/file.txt | xclip # save the output to your clipboard
+vpr-zero-sections path/to/executable
 ```
