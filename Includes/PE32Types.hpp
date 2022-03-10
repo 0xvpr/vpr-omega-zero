@@ -1,0 +1,3 @@
+#ifndef PE_32_TYPES_HEADER
+#define PE_32_TYPES_HEADER
+#endif // PE_32_TYPES_HEADER
