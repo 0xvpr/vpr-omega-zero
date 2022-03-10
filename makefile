@@ -9,12 +9,12 @@ LDFLAGS   =
 BIN       = Bin
 OBJ       = Build
 BUILD     = Build
-SOURCE    = Source
+SOURCE    = Sources
 
 SOURCES   = $(wildcard $(SOURCE)/*.cpp)
 OBJECTS   = $(patsubst $(SOURCE)/%.cpp,$(OBJ)/%.obj,$(SOURCES))
 
-INCLUDE   = Include
+INCLUDE   = Includes
 INCLUDES  = $(addprefix -I,$(INCLUDE))
 
 ifeq ($(PREFIX),)
