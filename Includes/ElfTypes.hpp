@@ -11,6 +11,7 @@ namespace elftypes {
     [[nodiscard]]
     uint16_t DetermineFiletype(std::ifstream&);
 
+    void ProcessElfx86(char*);
     void ProcessElfx86_64(char*);
 
 }

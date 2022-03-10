@@ -54,15 +54,23 @@ int main(int argc, char** argv) {
                 break;
             }
             case filetype::pe_x86:
+            {
+                break;
+            }
             case filetype::pe_x86_64:
             {
                 std::cout << "PE32 Not yet supported." << std::endl;
                 break;
             }
             case filetype::elf_x86:
+            {
+                elftypes::ProcessElfx86(filename);
+                break;
+            }
             case filetype::elf_x86_64:
             {
                 elftypes::ProcessElfx86_64(filename);
+                break;
             }
         }
     }
