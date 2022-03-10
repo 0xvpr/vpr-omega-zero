@@ -118,13 +118,6 @@ int main(int argc, char** argv) {
             auto null_bytes = new char[size];
             memset(null_bytes, 0, size);
 
-//#ifdef NDEBUG
-            //std::cout << "Start:\t\t"    << start_offset << "\n"
-                      //<< "Entry size:\t" << entry_size   << "\n"
-                      //<< "# Entries:\t"  << n_entries    << "\n"
-                      //<< std::endl;
-//#endif // NDEBUG
-
             // Overwrite total bytes
             fseek(fp, start_offset, SEEK_SET);
             fwrite(null_bytes, sizeof(char), size, fp);

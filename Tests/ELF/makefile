@@ -1,2 +1,2 @@
 all:
-	gcc elf.c -o elf.exe
+	g++ -g elf.cpp -o elf.exe

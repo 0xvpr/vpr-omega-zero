@@ -23,10 +23,10 @@ endif
 
 all: debug
 
-debug: CFLAGS+=-g
-debug: TARGET:=$(TARGET)_d
-release: CFLAGS+=-DNDEBUG -O3 -fno-ident -ffast-math -fvisibility=hidden
-release: LDFLAGS+=-s
+debug:    CFLAGS  += -g
+debug:    TARGET  := $(TARGET)_d
+release:  CFLAGS  += -DNDEBUG -O3 -fno-ident -ffast-math -fvisibility=hidden
+release:  LDFLAGS += -s
 
 debug: $(TARGET)
 release: $(TARGET)
@@ -34,14 +34,20 @@ release: $(TARGET)
 $(TARGET): $(BIN) $(BUILD) $(OBJECTS)
 	$(LD) $(LDFLAGS) $(OBJECTS) -o $(BIN)/$(TARGET)
 
-$(OBJECTS): $(OBJ)/%.obj : $(SOURCE)/%.cpp
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
 $(BIN):
 	mkdir -p $@
 
 $(BUILD):
 	mkdir -p $@
+
+.PHONY: $(OBJECTS)
+$(OBJECTS): $(OBJ)/%.obj : $(SOURCE)/%.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+.PHONY: tests
+tests:
+	make -C Tests/PE all
+	make -C Tests/ELF all
 
 .PHONY: install
 install: release

@@ -10,10 +10,10 @@ yellow="yellowbyte.txt"
 
 if ! [ -f ./Bin/vpr-zero-sections ];
 then
-    make
+    make release
 fi
 
-( cd Tests/ELF && make )
+make tests
 ./Bin/vpr-zero-sections "${object}"
 objdump -fs "${object}"  > "${vpr}"
 readelf -h "${object}"  >> "${vpr}"
@@ -24,7 +24,7 @@ then
     wget https://raw.githubusercontent.com/yellowbyte/reverse-engineering-playground/master/file_format_hacks/zeroSection2.py
 fi
 
-( cd Tests/ELF && make )
+make tests
 python2 ./zeroSection2.py "${object}"
 objdump -fs "${object}"  > "${yellow}"
 readelf -h "${object}"  >> "${yellow}"
