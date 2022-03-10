@@ -74,17 +74,17 @@ int main(int argc, char** argv) {
         {
             std::cout << "PE32 Not yet supported." << std::endl;
             return -1;
-            break;
         }
         case 2:
         {
-            std::cout << "ELF" << std::endl;
+            std::cout << "ELF detected.\n" << std::endl;
 
             // Open file as binary
-            FILE*       fp;
-            uint16_t    start_offset;
-            uint16_t    entry_size;
-            uint16_t    n_entries;
+            FILE*       fp{nullptr};
+            uint16_t    start_offset{0};
+            uint16_t    entry_size{0};
+            uint16_t    n_entries{0};
+            uint32_t    size{0};
 
             // Open target file
             if (!(fp = fopen(argv[1], "rb+"))) {
@@ -108,33 +108,41 @@ int main(int argc, char** argv) {
 
             // Number of entries
             fseek(fp, 48, SEEK_SET); // two bytes
-            if (!fread(&n_entries, sizeof(n_entries)/2, 1, fp)) {
+            if (!fread(&n_entries, sizeof(n_entries), 1, fp)) {
+                std::cerr << "Failed to read bytes for number of entries." << std::endl;
                 return errno;
             }
 
             // Calculate total size
-            unsigned size = entry_size * n_entries;
+            size = entry_size * n_entries;
             auto null_bytes = new char[size];
             memset(null_bytes, 0, size);
 
+//#ifdef NDEBUG
+            //std::cout << "Start:\t\t"    << start_offset << "\n"
+                      //<< "Entry size:\t" << entry_size   << "\n"
+                      //<< "# Entries:\t"  << n_entries    << "\n"
+                      //<< std::endl;
+//#endif // NDEBUG
+
             // Overwrite total bytes
             fseek(fp, start_offset, SEEK_SET);
-            fwrite(null_bytes, size, sizeof(char), fp);
-            delete[] null_bytes;
+            fwrite(null_bytes, sizeof(char), size, fp);
 
             // Overwrite the pointers section header info
-            auto offsets = { 0x20, 0x2e, 0x30, 0x32 };
-            for (auto offset : offsets) {
+            const uint16_t offsets[4] = { 0x20, 0x2e, 0x30, 0x32 };
+            for (const auto offset : offsets) {
                 fseek(fp, offset, SEEK_SET);
                 if (offset == 0x20) {
-                    fwrite("\0\0\0\0", 4, sizeof(char), fp);
+                    fwrite(null_bytes, sizeof(char), 4, fp);
                 } else {
-                    fwrite("\0\0", 4, sizeof(char), fp);
+                    fwrite(null_bytes, sizeof(char), 2, fp);
                 }
             }
 
+            delete[] null_bytes;
             fclose(fp);
-            break;
+            return 0;
         }
         default:
             break;
