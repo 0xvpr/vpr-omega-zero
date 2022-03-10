@@ -4,53 +4,8 @@
 #include <iostream>
 #include <cstring>
 
-[[nodiscard]]
-uint16_t elftypes::DetermineElfArchitecture(char* header) {
-
-    const static unsigned char elf_magic[4] = {
-        0x7f, 0x45, 0x4c, 0x46,
-    };
-
-    // Check if first bytes are 'magic'
-    for (size_t i = 0; i < sizeof(elf_magic); i++) {
-        if (header[i] != elf_magic[i]) {
-            return filetype::unsupported;
-        }
-    }
-
-    switch (header[4]) {
-        case 1:  { return filetype::elf_x86; }
-        case 2:  { return filetype::elf_x86_64; }
-        default: { break; }
-    }
-
-    return filetype::unsupported;
-
-}
-
-[[nodiscard]]
-uint16_t elftypes::DetermineFiletype(std::ifstream& ifs) {
-
-    uint16_t architecture = 0;
-
-    if (ifs.good()) {
-        char header[64]{0};
-        
-        ifs.read(header, sizeof(header));
-        if (architecture) {
-            ifs.close();
-            return architecture;
-        } else if ((architecture = DetermineElfArchitecture(header))) {
-            ifs.close();
-            return architecture;
-        }
-    }
-
-    ifs.close();
-    return architecture;
-}
-
 void elftypes::ProcessElfx86(char* filename) {
+
     // Open file as binary
     FILE*       fp{nullptr};
     uint32_t     e_shoff{0};
@@ -133,6 +88,7 @@ void elftypes::ProcessElfx86(char* filename) {
 }
 
 void elftypes::ProcessElfx86_64(char* filename) {
+
     // Open file as binary
     FILE*       fp{nullptr};
     int64_t     e_shoff{0};

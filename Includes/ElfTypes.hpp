@@ -1,17 +1,23 @@
 #ifndef ELF_TYPES_HEADER
 #define ELF_TYPES_HEADER
 
-#include <fstream>
-
 namespace elftypes {
 
-    [[nodiscard]]
-    uint16_t DetermineElfArchitecture(char*);
 
-    [[nodiscard]]
-    uint16_t DetermineFiletype(std::ifstream&);
-
+    /**
+     * Perform scraping of 32 bit ELF binary.
+     *
+     * @param    filename
+     * @return   void
+    **/
     void ProcessElfx86(char*);
+
+    /**
+     * Perform scraping of 64 bit ELF binary.
+     *
+     * @param    filename
+     * @return   void
+    **/
     void ProcessElfx86_64(char*);
 
 }

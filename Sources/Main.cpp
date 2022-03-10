@@ -11,7 +11,7 @@
  *     section-header information of ELF and PE32 executables.
 **/
 
-#include "Filetypes.hpp"   // namespace filetype
+#include "Filetypes.hpp"   // namespace filetypes
 #include "PE32Types.hpp"   // namespace pe32types
 #include "ElfTypes.hpp"    // namespace elftypes
 #include "Util.hpp"        // __usage_error
@@ -42,32 +42,34 @@ int main(int argc, char** argv) {
         std::ifstream ifs(argv[i]);
         if (!ifs.is_open()) {
             std::cerr << "Failed to open '" << filename << "'." << std::endl;
-            return 2;
+            return ifs.fail();
         }
 
-        auto filetype = elftypes::DetermineFiletype(ifs);
+        auto filetype = filetypes::DetermineFiletype(ifs);
         switch (filetype)
         {
-            case filetype::unsupported:
+            case filetypes::unsupported:
             {
-                std::cout << "Filetype not supported." << std::endl;
+                std::cout << "Filetype not supported."
+                          << "Skipping '" << filename << "'." << std::endl;
                 break;
             }
-            case filetype::pe_x86:
-            {
-                break;
-            }
-            case filetype::pe_x86_64:
+            case filetypes::pe_x86:
             {
                 std::cout << "PE32 Not yet supported." << std::endl;
                 break;
             }
-            case filetype::elf_x86:
+            case filetypes::pe_x86_64:
+            {
+                std::cout << "PE32+ Not yet supported." << std::endl;
+                break;
+            }
+            case filetypes::elf_x86:
             {
                 elftypes::ProcessElfx86(filename);
                 break;
             }
-            case filetype::elf_x86_64:
+            case filetypes::elf_x86_64:
             {
                 elftypes::ProcessElfx86_64(filename);
                 break;
