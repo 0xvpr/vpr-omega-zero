@@ -1,13 +1,14 @@
-#include "ElfTypes.hpp"
+#include "Elf.hpp"
+
 #include "Filetypes.hpp"
 
 #include <iostream>
 #include <cstring>
 
-using elftypes::ElfHeader32;
-using elftypes::ElfHeader64;
+using elf::ElfHeader32;
+using elf::ElfHeader64;
 
-void elftypes::ProcessElfx86(char* filename) {
+void elf::ProcessElf32(char* filename) {
 
     FILE*       fp{nullptr};
     ElfHeader32 header{};
@@ -66,7 +67,7 @@ void elftypes::ProcessElfx86(char* filename) {
     return;
 }
 
-void elftypes::ProcessElfx86_64(char* filename) {
+void elf::ProcessElf64(char* filename) {
 
     FILE*       fp{nullptr};
     ElfHeader64 header{};

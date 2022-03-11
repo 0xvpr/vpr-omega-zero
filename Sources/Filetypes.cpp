@@ -1,14 +1,14 @@
 #include "Filetypes.hpp"
-#include "Pe32Types.hpp"
+#include "Pe32.hpp"
 
 #include <iostream>
 
 [[nodiscard]]
 static uint16_t DeterminePe32Architecture(std::ifstream& ifs) {
 
-    using pe32types::Pe32OptionalHeader;
-    using pe32types::Pe32Header;
-    using pe32types::MsDosStub;
+    using pe32::Pe32OptionalHeader;
+    using pe32::Pe32Header;
+    using pe32::MsDosStub;
 
     const size_t size = sizeof(MsDosStub) +
         sizeof(Pe32Header) + sizeof(Pe32OptionalHeader);
@@ -21,7 +21,7 @@ static uint16_t DeterminePe32Architecture(std::ifstream& ifs) {
         return filetypes::unsupported;
     }
 
-    auto optional_header = (pe32types::Pe32OptionalHeader *)(header +
+    auto optional_header = (pe32::Pe32OptionalHeader *)(header +
         sizeof(MsDosStub) + sizeof(Pe32Header));
     switch (optional_header->mMagic >> 9) {
         case  0: { return filetypes::pe_x86;    }

@@ -1,12 +1,12 @@
-#ifndef ELF_TYPES_HEADER
-#define ELF_TYPES_HEADER
+#ifndef ELF_HEADER
+#define ELF_HEADER
 
 #include <cstdint>
 
 // Structs
-namespace elftypes {
+namespace elf {
 
-    typedef struct {
+    typedef struct _ElfHeader32 {
         unsigned char   e_magic[16];
         uint16_t        e_type;
         uint16_t        e_machine;
@@ -23,7 +23,7 @@ namespace elftypes {
         uint16_t        e_shstrndx;
     } ElfHeader32;
 
-    typedef struct {
+    typedef struct _ElfHeader64 {
         unsigned char   e_magic[16];
         uint16_t        e_type;
         uint16_t        e_machine;
@@ -40,9 +40,10 @@ namespace elftypes {
         uint16_t        e_shstrndx;
     } ElfHeader64;
 
-} // namespace elftypes
+} // namespace elf
 
-namespace elftypes {
+// Functions
+namespace elf {
 
     /**
      * Perform scraping of 32 bit ELF binary.
@@ -50,7 +51,7 @@ namespace elftypes {
      * @param    filename
      * @return   void
     **/
-    void ProcessElfx86(char*);
+    void ProcessElf32(char*);
 
     /**
      * Perform scraping of 64 bit ELF binary.
@@ -58,8 +59,8 @@ namespace elftypes {
      * @param    filename
      * @return   void
     **/
-    void ProcessElfx86_64(char*);
+    void ProcessElf64(char*);
 
-} // namespace elftypes
+} // namespace elf
 
-#endif // ELF_TYPES_HEADER
+#endif // ELF_HEADER

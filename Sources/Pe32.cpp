@@ -1,9 +1,9 @@
-#include "Pe32Types.hpp"
+#include "Pe32.hpp"
 
 #include <iostream>
 #include <cstring>
 
-void pe32types::ProcessPe32x86(char* filename) {
+void pe32::ProcessPe32(char* filename) {
 
     FILE*               fp{nullptr};
     Pe32Header          header{};
@@ -124,7 +124,7 @@ void pe32types::ProcessPe32x86(char* filename) {
     return;
 }
 
-void pe32types::ProcessPe32x86_64(char* filename) {
+void pe32::ProcessPe64(char* filename) {
 
     FILE*               fp{nullptr};
     Pe32Header          header{};
