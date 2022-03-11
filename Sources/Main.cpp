@@ -1,14 +1,16 @@
 /**
- * Creator: VPR
- * Created: March 9th, 2022
- * Updated: March 9th, 2022
+ * Project:    vpr-omega-zero
+ *
+ * Creator:    VPR
+ * Created:    March 9th, 2022
+ * Updated:    March 11th, 2022
  *
  * Description:
  *     Inspired by yellobytes's 'zeroSection2.py'
  *     https://github.com/yellowbyte/reverse-engineering-playground/tree/master/file_format_hacks
  *
- *     This project aim's to provide a tool for the stripping of the
- *     section-header information of ELF and PE32 executables.
+ *     Omega Zero aims to provide a tool for the stripping of the
+ *     section-header information of x86 and x86_64 ELF and PE32 binaries.
 **/
 
 #include "Filetypes.hpp"   // namespace filetypes
@@ -20,7 +22,6 @@
 #include <iostream>
 #include <fstream>
 
-#define ERR_FILE_NOT_SUPPORTED 0xFF
 #define ERR_NO_ARGS            0xFF
 #define ERR_FILE_DNE           0x01
 
