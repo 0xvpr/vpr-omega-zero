@@ -46,8 +46,8 @@ $(OBJECTS): $(OBJ)/%.obj : $(SOURCE)/%.cpp
 
 .PHONY: tests
 tests:
-	make -C Tests/PE all
 	make -C Tests/ELF all
+	make -C Tests/PE all
 
 .PHONY: install
 install: release
@@ -58,8 +58,12 @@ install: release
 clean:
 	rm -fr $(BIN)/*
 	rm -fr $(BUILD)/*
+	make -C Tests/ELF clean
+	make -C Tests/PE clean
 
 .PHONY: extra-clean
 extra-clean:
 	rm -fr $(BIN)
 	rm -fr $(BUILD)
+	make -C Tests/ELF clean
+	make -C Tests/PE clean

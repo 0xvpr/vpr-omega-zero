@@ -6,7 +6,7 @@
 
 namespace filetypes {
 
-    enum {
+    enum T : uint16_t {
         unsupported,   // 0
         pe_x86,        // 1
         pe_x86_64,     // 2

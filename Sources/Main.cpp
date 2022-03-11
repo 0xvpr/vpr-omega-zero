@@ -50,27 +50,31 @@ int main(int argc, char** argv) {
         {
             case filetypes::unsupported:
             {
-                std::cout << "Filetype not supported."
+                std::cout << "Filetype not supported." << " " << filetype << "\n"
                           << "Skipping '" << filename << "'." << std::endl;
                 break;
             }
             case filetypes::pe_x86:
             {
-                std::cout << "PE32 Not yet supported." << std::endl;
+                std::cout << "PE32" << std::endl;
+                pe32types::ProcessPe32x86(filename);
                 break;
             }
             case filetypes::pe_x86_64:
             {
-                std::cout << "PE32+ Not yet supported." << std::endl;
+                std::cout << "PE32+ (x86_64)" << std::endl;
+                pe32types::ProcessPe32x86_64(filename);
                 break;
             }
             case filetypes::elf_x86:
             {
+                std::cout << "ELF x86" << std::endl;
                 elftypes::ProcessElfx86(filename);
                 break;
             }
             case filetypes::elf_x86_64:
             {
+                std::cout << "ELF x86_64" << std::endl;
                 elftypes::ProcessElfx86_64(filename);
                 break;
             }

@@ -1,17 +1,47 @@
 #include "Filetypes.hpp"
+#include "Pe32Types.hpp"
+
+#include <iostream>
 
 [[nodiscard]]
-static uint16_t DetermineElfArchitecture(char* header) {
+static uint16_t DeterminePe32Architecture(std::ifstream& ifs) {
 
-    const static unsigned char elf_magic[4] = {
-        0x7f, 0x45, 0x4c, 0x46,
-    };
+    using pe32types::Pe32OptionalHeader;
+    using pe32types::Pe32Header;
+    using pe32types::MsDosStub;
 
-    // Check if first bytes are 'magic'
-    for (size_t i = 0; i < sizeof(elf_magic); i++) {
-        if (header[i] != elf_magic[i]) {
-            return filetypes::unsupported;
-        }
+    const size_t size = sizeof(MsDosStub) +
+        sizeof(Pe32Header) + sizeof(Pe32OptionalHeader);
+    char header[size]{0};
+
+    ifs.seekg(0, std::ios::beg);
+    ifs.read(header, sizeof(header));
+
+    if (header[0] != 'M' || header[1] != 'Z') {
+        return filetypes::unsupported;
+    }
+
+    auto optional_header = (pe32types::Pe32OptionalHeader *)(header +
+        sizeof(MsDosStub) + sizeof(Pe32Header));
+    switch (optional_header->mMagic >> 9) {
+        case  0: { return filetypes::pe_x86;    }
+        case  1: { return filetypes::pe_x86_64; }
+        default: { break;                       }
+    } 
+
+    return filetypes::unsupported;
+
+}
+
+[[nodiscard]]
+static uint16_t DetermineElfArchitecture(std::ifstream& ifs) {
+
+    char header[8]{0};
+    ifs.seekg(0, std::ios::beg);
+    ifs.read(header, sizeof(header));
+
+    if (header[0] != 0x7F || header[1] != 'E' || header[2] != 'L' || header[3] != 'F') {
+        return filetypes::unsupported;
     }
 
     switch (header[4]) {
@@ -30,16 +60,7 @@ uint16_t filetypes::DetermineFiletype(std::ifstream& ifs) {
     uint16_t architecture = 0;
 
     if (ifs.good()) {
-        char header[64]{0};
-        
-        ifs.read(header, sizeof(header));
-        if (architecture) {
-            ifs.close();
-            return architecture;
-        } else if ((architecture = DetermineElfArchitecture(header))) {
-            ifs.close();
-            return architecture;
-        }
+        architecture = static_cast<uint16_t>(DeterminePe32Architecture(ifs) + DetermineElfArchitecture(ifs));
     }
 
     ifs.close();
