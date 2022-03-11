@@ -2,22 +2,24 @@
 
 # Creator:    VPR
 # Created:    March 9th, 2022
-# Creator:    March 9th, 2022
+# Creator:    March 10th, 2022
 
-object=Tests/ELF/elf.exe
+declare -a objects=("Tests/ELF/elf_x86.exe" "Tests/ELF/elf_x86_64.exe")
 vpr="vpr.txt"
-yellow="yellowbyte.txt"
+yellowbyte="yellowbyte.txt"
 
-if ! [ -f ./Bin/vpr-zero-sections ];
+if ! [ -f ./Bin/vpr-omega-zero ];
 then
     make release
 fi
 
 make tests
-./Bin/vpr-zero-sections "${object}"
-objdump -fs "${object}"  > "${vpr}"
-readelf -h "${object}"  >> "${vpr}"
-readelf -l "${object}"  >> "${vpr}"
+for i in "${objects[@]}"
+do
+    ./Bin/vpr-omega-zero "${i}"
+    objdump -fs "${i}"   >> "${vpr}"
+    readelf -lh "${i}"   >> "${vpr}"
+done
 
 if ! [ -f ./zeroSection2.py ];
 then
@@ -25,12 +27,15 @@ then
 fi
 
 make tests
-python2 ./zeroSection2.py "${object}"
-objdump -fs "${object}"  > "${yellow}"
-readelf -h "${object}"  >> "${yellow}"
-readelf -l "${object}"  >> "${yellow}"
+for i in "${objects[@]}"
+do
+    python2 ./zeroSection2.py "${i}"
+    objdump -fs "${i}"     >> "${yellowbyte}"
+    readelf -lh "${i}"     >> "${yellowbyte}"
+done
 
-diff ${vpr} ${yellow}
+diff ${vpr} ${yellowbyte} -q
+diff ${vpr} ${yellowbyte} | wc
 
 rm zeroSection2.py
-rm ${vpr} ${yellow}
+rm ${vpr} ${yellowbyte}

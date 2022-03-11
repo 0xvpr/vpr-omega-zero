@@ -46,3 +46,6 @@ Build
 *.exe
 *.lib
 *.dll
+
+# Misc
+quick-test.sh
