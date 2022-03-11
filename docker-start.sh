@@ -6,4 +6,4 @@
 
 DOCKER_IMAGE="omega-zero-dev"
 
-docker run -itv .:/home/omega-zero "${DOCKER_IMAGE}" .
+docker run -itv ${PWD}:/home/oz/omega-zero "${DOCKER_IMAGE}"

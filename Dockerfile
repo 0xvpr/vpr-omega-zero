@@ -44,4 +44,4 @@ RUN chsh -s /bin/zsh $(whoami)
 # Create omega-zero user && working directory
 RUN mkdir -p /home/oz
 ENV HOME=/home/root
-WORKDIR /home/oz
+WORKDIR /home/oz/omega-zero
