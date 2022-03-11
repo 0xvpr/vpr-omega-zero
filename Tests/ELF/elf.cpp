@@ -2,6 +2,8 @@
 
 int main() {
 
-    return puts("Unix");
+    puts("Unix");
+
+    return 0;
 
 }
