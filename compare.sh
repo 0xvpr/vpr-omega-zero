@@ -8,7 +8,7 @@ declare -a objects=("Tests/ELF/elf_x86.exe" "Tests/ELF/elf_x86_64.exe")
 vpr="vpr.txt"
 yellowbyte="yellowbyte.txt"
 
-if ! [ -f ./Bin/vpr-zero-sections ];
+if ! [ -f ./Bin/vpr-omega-zero ];
 then
     make release
 fi
@@ -16,7 +16,7 @@ fi
 make tests
 for i in "${objects[@]}"
 do
-    ./Bin/vpr-zero-sections "${i}"
+    ./Bin/vpr-omega-zero "${i}"
     objdump -fs "${i}"   >> "${vpr}"
     readelf -lh "${i}"   >> "${vpr}"
 done
