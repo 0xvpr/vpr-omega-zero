@@ -21,7 +21,7 @@ ifeq ($(PREFIX),)
 PREFIX    = /usr/local
 endif
 
-all: debug
+all: release debug tests
 
 debug:    CFLAGS  += -g
 debug:    TARGET  := $(TARGET)_d

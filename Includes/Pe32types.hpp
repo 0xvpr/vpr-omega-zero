@@ -55,6 +55,19 @@ namespace pe32types {
         uint32_t mNumberOfRvaAndSizes;
     } Pe32OptionalHeader;
 
+    typedef struct {
+        char     mName[8];
+        uint32_t mVirtualSize;
+        uint32_t mVirtualAddress;
+        uint32_t mSizeOfRawData;
+        uint32_t mPointerToRawData;
+        uint32_t mPointerToRelocations;
+        uint32_t mPointerToLinenumbers;
+        uint16_t mNumberOfRelocations;
+        uint16_t mNumberOfLinenumbers;
+        uint32_t mCharacteristics;
+    } Pe32SectionHeader;
+
 }
 
 // Functions
