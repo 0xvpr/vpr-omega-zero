@@ -1,26 +1,27 @@
 /**
- * Creator: VPR
- * Created: March 9th, 2022
- * Updated: March 9th, 2022
+ * Project:    vpr-omega-zero
+ *
+ * Creator:    VPR
+ * Created:    March 9th, 2022
+ * Updated:    March 11th, 2022
  *
  * Description:
  *     Inspired by yellobytes's 'zeroSection2.py'
  *     https://github.com/yellowbyte/reverse-engineering-playground/tree/master/file_format_hacks
  *
- *     This project aim's to provide a tool for the stripping of the
- *     section-header information of ELF and PE32 executables.
+ *     Omega Zero aims to provide a tool for the stripping of the
+ *     section-header information of x86 and x86_64 ELF and PE32 binaries.
 **/
 
 #include "Filetypes.hpp"   // namespace filetypes
-#include "PE32Types.hpp"   // namespace pe32types
-#include "ElfTypes.hpp"    // namespace elftypes
 #include "Util.hpp"        // __usage_error
+#include "Pe32.hpp"        // namespace pe32
+#include "Elf.hpp"         // namespace elf
 
 #include <filesystem>
 #include <iostream>
 #include <fstream>
 
-#define ERR_FILE_NOT_SUPPORTED 0xFF
 #define ERR_NO_ARGS            0xFF
 #define ERR_FILE_DNE           0x01
 
@@ -57,25 +58,25 @@ int main(int argc, char** argv) {
             case filetypes::pe_x86:
             {
                 std::cout << "PE32" << std::endl;
-                pe32types::ProcessPe32x86(filename);
+                pe32::ProcessPe32(filename);
                 break;
             }
             case filetypes::pe_x86_64:
             {
                 std::cout << "PE32+ (x86_64)" << std::endl;
-                pe32types::ProcessPe32x86_64(filename);
+                pe32::ProcessPe64(filename);
                 break;
             }
             case filetypes::elf_x86:
             {
                 std::cout << "ELF x86" << std::endl;
-                elftypes::ProcessElfx86(filename);
+                elf::ProcessElf32(filename);
                 break;
             }
             case filetypes::elf_x86_64:
             {
                 std::cout << "ELF x86_64" << std::endl;
-                elftypes::ProcessElfx86_64(filename);
+                elf::ProcessElf64(filename);
                 break;
             }
         }

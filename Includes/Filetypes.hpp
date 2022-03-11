@@ -1,5 +1,5 @@
-#ifndef FILETYPE_HEADER
-#define FILETYPE_HEADER
+#ifndef FILETYPES_HEADER
+#define FILETYPES_HEADER
 
 #include <fstream>
 #include <cstdint>
@@ -22,6 +22,6 @@ namespace filetypes {
     **/
     [[nodiscard]] uint16_t DetermineFiletype(std::ifstream&);
 
-}
+} // namespace filetypes
 
-#endif // FILETYPE_HEADER
+#endif // FILETYPES_HEADER

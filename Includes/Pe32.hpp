@@ -1,17 +1,17 @@
-#ifndef PE_32_TYPES_HEADER
-#define PE_32_TYPES_HEADER
+#ifndef PE_32_HEADER
+#define PE_32_HEADER
 
 #include <cstdint>
 
 // Structs
-namespace pe32types {
+namespace pe32 {
 
-    typedef struct {
+    typedef struct _MsDosStub {
         uint16_t mMagic;
         unsigned char bits[126];
     } MsDosStub;
 
-    typedef struct {
+    typedef struct _Pe32Header {
         uint32_t mMagic; // PE\0\0 or 0x00004550
         uint16_t mMachine;
         uint16_t mNumberOfSections;
@@ -22,7 +22,7 @@ namespace pe32types {
         uint16_t mCharacteristics;
     } Pe32Header;
 
-    typedef struct {
+    typedef struct _Pe32OptionalHeader {
         uint16_t mMagic; // 0x010b - PE32, 0x020b - PE32+ (64 bit)
         uint8_t  mMajorLinkerVersion;
         uint8_t  mMinorLinkerVersion;
@@ -55,7 +55,7 @@ namespace pe32types {
         uint32_t mNumberOfRvaAndSizes;
     } Pe32OptionalHeader;
 
-    typedef struct {
+    typedef struct _Pe32SectionHeader {
         char     mName[8];
         uint32_t mVirtualSize;
         uint32_t mVirtualAddress;
@@ -68,10 +68,10 @@ namespace pe32types {
         uint32_t mCharacteristics;
     } Pe32SectionHeader;
 
-}
+} // namespace pe32
 
 // Functions
-namespace pe32types {
+namespace pe32 {
 
     /**
      * Perform scraping of 32 bit PE32 binary.
@@ -79,7 +79,7 @@ namespace pe32types {
      * @param    filename
      * @return   void
     **/
-    void ProcessPe32x86(char*);
+    void ProcessPe32(char*);
 
     /**
      * Perform scraping of 64 bit PE32+ binary.
@@ -87,8 +87,8 @@ namespace pe32types {
      * @param    filename
      * @return   void
     **/
-    void ProcessPe32x86_64(char*);
+    void ProcessPe64(char*);
 
-}
+} // namespace pe32
 
-#endif // PE_32_TYPES_HEADER
+#endif // PE_32_HEADER
