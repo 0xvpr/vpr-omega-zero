@@ -1,4 +1,4 @@
-TARGET    = vpr-zero-sections
+TARGET    = vpr-omega-zero
 
 CC        = g++
 CFLAGS    = -std=c++2a -O2 -Wall -Wextra -Werror -Wshadow -Wpedantic -Wconversion
