@@ -12,7 +12,8 @@ BUILD     = Build
 SOURCE    = Sources
 
 SOURCES   = $(wildcard $(SOURCE)/*.cpp)
-OBJECTS   = $(patsubst $(SOURCE)/%.cpp,$(OBJ)/%.obj,$(SOURCES))
+DEBUG     = $(patsubst $(SOURCE)/%.cpp,$(OBJ)/debug/%.obj,$(SOURCES))
+RELEASE   = $(patsubst $(SOURCE)/%.cpp,$(OBJ)/release/%.obj,$(SOURCES))
 
 INCLUDE   = Includes
 INCLUDES  = $(addprefix -I,$(INCLUDE))
@@ -21,28 +22,36 @@ ifeq ($(PREFIX),)
 PREFIX    = /usr/local
 endif
 
-all: release debug tests
+MAKEFLAGS += -j$(shell nproc)
 
-debug:    CFLAGS  += -g
-debug:    TARGET  := $(TARGET)_d
-release:  CFLAGS  += -DNDEBUG -O3 -fno-ident -ffast-math -fvisibility=hidden
-release:  LDFLAGS += -s
+all: debug
 
-debug: $(TARGET)
-release: $(TARGET)
+debug:   CFLAGS  += -g
+release: CFLAGS  += -DRELEASE -O3 -fno-ident -ffast-math -fvisibility=hidden
+release: LDFLAGS += -s
 
-$(TARGET): $(BIN) $(BUILD) $(OBJECTS)
-	$(LD) $(LDFLAGS) $(OBJECTS) -o $(BIN)/$(TARGET)
+debug:   $(BIN)/$(TARGET)_d
+release: $(BIN)/$(TARGET)
+
+$(BIN)/$(TARGET)_d: $(BIN) $(BUILD) $(DEBUG)
+	$(LD) $(LDFLAGS) $(DEBUG) -o $(BIN)/$(TARGET)_d
+
+$(BIN)/$(TARGET): $(BIN) $(BUILD) $(RELEASE)
+	$(LD) $(LDFLAGS) $(RELEASE) -o $(BIN)/$(TARGET)
+
+$(DEBUG): $(OBJ)/debug/%.obj : $(SOURCE)/%.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+$(RELEASE): $(OBJ)/release/%.obj : $(SOURCE)/%.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 $(BIN):
 	mkdir -p $@
 
 $(BUILD):
-	mkdir -p $@
+	mkdir -p $@/debug
+	mkdir -p $@/release
 
-.PHONY: $(OBJECTS)
-$(OBJECTS): $(OBJ)/%.obj : $(SOURCE)/%.cpp
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 .PHONY: tests
 tests:
