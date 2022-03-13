@@ -110,7 +110,7 @@ bool elf::ProcessElf64(char* filename) {
     memset(null_bytes, 0, shsize);
 
     // Overwrite total bytes
-    fs.seekg((long)header.e_shoff, std::ios::beg);
+    fs.seekg(static_cast<long>(header.e_shoff), std::ios::beg);
     fs.write(null_bytes, static_cast<long>(shsize));
     if (fs.fail()) {
         delete[] null_bytes;
