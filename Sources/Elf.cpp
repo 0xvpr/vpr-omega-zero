@@ -3,35 +3,40 @@
 #include "Filetypes.hpp"
 
 #include <iostream>
+#include <fstream>
 #include <cstring>
 
 using elf::ElfHeader32;
 using elf::ElfHeader64;
 
-void elf::ProcessElf32(char* filename) {
+[[nodiscard]]
+bool elf::ProcessElf32(char* filename) {
 
-    FILE*       fp{nullptr};
-    ElfHeader32 header{};
+    std::fstream fs;
+    ElfHeader32 header;
 
     // Open target file
-    if (!(fp = fopen(filename, "rb+"))) {
+    fs.open(filename, std::ios::binary | std::ios::in | std::ios::out);
+    if (!fs.is_open()) {
         std::cerr << "Failed to open '" << filename << "' for reading." << std::endl;
-        exit(errno);
+        return false;
     }
 
     // Get header information
-    fseek(fp, 0, SEEK_SET);
-    if (fread(&header, sizeof(ElfHeader32), 1, fp) != 1) {
+    fs.seekg(0, std::ios::beg);
+    fs.read((char *)&header, sizeof(header));
+    if (fs.fail()) {
         std::cerr << "Failed to read bytes for elf header." << std::endl;
-        exit(errno);
+        fs.close();
+        return false;
     }
     
     // If file has a zeroed value, skip the file
     if ((header.e_shentsize * header.e_shnum) == 0) {
         std::cerr << "'" << filename << "' has a invalid section header entry size and/or section header number.\n"
                   << "Skipping '" << filename << "'.\n";
-        fclose(fp);
-        return;
+        fs.close();
+        return false;
     }
 
     // Calculate total size
@@ -40,11 +45,13 @@ void elf::ProcessElf32(char* filename) {
     memset(null_bytes, 0, shsize);
 
     // Overwrite total bytes
-    fseek(fp, header.e_shoff, SEEK_SET);
-    if (fwrite(null_bytes, sizeof(char), shsize, fp) != shsize) {
+    fs.seekg(header.e_shoff, std::ios::beg);
+    fs.write(null_bytes, static_cast<long>(shsize));
+    if (fs.fail()) {
         delete[] null_bytes;
         std::cerr << "Failed to overwrite section-header." << std::endl;
-        exit(std::ferror(fp));
+        fs.close();
+        return false;
     }
     delete[] null_bytes;
 
@@ -55,42 +62,46 @@ void elf::ProcessElf32(char* filename) {
     header.e_shstrndx  = 0;
 
     // Write the bytes out
-    fseek(fp, 0, SEEK_SET);
-    if (fwrite(&header, sizeof(ElfHeader32), 1, fp) != 1) {
+    fs.seekg(0, std::ios::beg);
+    fs.write((char *)&header, sizeof(header));
+    if (fs.fail()) {
         std::cerr << "Failed to overwrite header." << std::endl;
-        exit(std::ferror(fp));
+        fs.close();
+        return false;
     }
 
-    std::cout << filename << " successfully processed." << std::endl;
-
-    fclose(fp);
-    return;
+    fs.close();
+    return true;
 }
 
-void elf::ProcessElf64(char* filename) {
+[[nodiscard]]
+bool elf::ProcessElf64(char* filename) {
 
-    FILE*       fp{nullptr};
-    ElfHeader64 header{};
+    std::fstream fs;
+    ElfHeader64 header;
 
     // Open target file
-    if (!(fp = fopen(filename, "rb+"))) {
+    fs.open(filename, std::ios::binary | std::ios::in | std::ios::out);
+    if (!fs.is_open()) {
         std::cerr << "Failed to open '" << filename << "' for reading." << std::endl;
-        exit(errno);
+        return false;
     }
 
     // Get header information
-    fseek(fp, 0, SEEK_SET);
-    if (fread(&header, sizeof(ElfHeader64), 1, fp) != 1) {
+    fs.seekg(0, std::ios::beg);
+    fs.read((char *)&header, sizeof(header));
+    if (fs.fail()) {
         std::cerr << "Failed to read bytes for elf header." << std::endl;
-        exit(errno);
+        fs.close();
+        return false;
     }
     
     // If file has a zeroed value, skip the file
     if ((header.e_shentsize * header.e_shnum) == 0) {
         std::cerr << "'" << filename << "' has a invalid section header entry size and/or section header number.\n"
                   << "Skipping '" << filename << "'.\n";
-        fclose(fp);
-        return;
+        fs.close();
+        return false;
     }
 
     // Calculate total size
@@ -99,11 +110,13 @@ void elf::ProcessElf64(char* filename) {
     memset(null_bytes, 0, shsize);
 
     // Overwrite total bytes
-    fseek(fp, (uint32_t)header.e_shoff, SEEK_SET);
-    if (fwrite(null_bytes, sizeof(char), shsize, fp) != shsize) {
+    fs.seekg(static_cast<long>(header.e_shoff), std::ios::beg);
+    fs.write(null_bytes, static_cast<long>(shsize));
+    if (fs.fail()) {
         delete[] null_bytes;
         std::cerr << "Failed to overwrite section-header." << std::endl;
-        exit(std::ferror(fp));
+        fs.close();
+        return false;
     }
     delete[] null_bytes;
 
@@ -114,14 +127,14 @@ void elf::ProcessElf64(char* filename) {
     header.e_shstrndx  = 0;
 
     // Write the bytes out
-    fseek(fp, 0, SEEK_SET);
-    if (fwrite(&header, sizeof(ElfHeader64), 1, fp) != 1) {
+    fs.seekg(0, std::ios::beg);
+    fs.write((char *)&header, sizeof(header));
+    if (fs.fail()) {
         std::cerr << "Failed to overwrite header." << std::endl;
-        exit(std::ferror(fp));
+        fs.close();
+        return false;
     }
 
-    std::cout << filename << " successfully processed." << std::endl;
-
-    fclose(fp);
-    return;
+    fs.close();
+    return true;
 }

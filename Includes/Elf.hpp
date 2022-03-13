@@ -49,17 +49,19 @@ namespace elf {
      * Perform scraping of 32 bit ELF binary.
      *
      * @param    filename
-     * @return   void
+     * @return   success
     **/
-    void ProcessElf32(char*);
+    [[nodiscard]]
+    bool ProcessElf32(char*);
 
     /**
      * Perform scraping of 64 bit ELF binary.
      *
      * @param    filename
-     * @return   void
+     * @return   success
     **/
-    void ProcessElf64(char*);
+    [[nodiscard]]
+    bool ProcessElf64(char*);
 
 } // namespace elf
 

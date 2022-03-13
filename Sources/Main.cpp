@@ -14,6 +14,7 @@
 **/
 
 #include "Filetypes.hpp"   // namespace filetypes
+#include "Parser.hpp"      // namespace parser
 #include "Util.hpp"        // __usage_error
 #include "Pe32.hpp"        // namespace pe32
 #include "Elf.hpp"         // namespace elf
@@ -22,64 +23,79 @@
 #include <iostream>
 #include <fstream>
 
-#define ERR_NO_ARGS            0xFF
-#define ERR_FILE_DNE           0x01
+#define ERR_NO_ARGS (int)0xFFFFFFFF
 
 int main(int argc, char** argv) {
 
-    if (!(argc-1)) {
+    if (argc < 2) {
         __usage_error(argv[0], ERR_NO_ARGS);
     }
 
-    for (int i = 1; i < argc; i++) {
+    auto cl = parser::CommandLine(argc, argv);
+    for (const auto& filename : cl.Filenames()) {
 
-        auto filename = argv[i];
         std::cout << "Processing '" << filename << "'..." << std::endl;
 
-        if (!std::filesystem::is_regular_file(filename)) {
-            __usage_error(argv[0], ERR_FILE_DNE);
+        if (!std::filesystem::exists(filename)) {
+            std::cerr << "'" << filename << "' does not exist." << std::endl;
+            std::cout << "Skipping '" << filename << "'...\n" << std::endl;
+            continue;
+        } else if (!std::filesystem::is_regular_file(filename) || std::filesystem::is_directory(filename)) {
+            std::cerr << "'" << filename << "' is not a regular file." << std::endl;
+            std::cout << "Skipping '" << filename << "'...\n" << std::endl;
+            continue;
         }
 
-        std::ifstream ifs(argv[i]);
+        std::ifstream ifs(filename);
         if (!ifs.is_open()) {
-            std::cerr << "Failed to open '" << filename << "'." << std::endl;
-            return ifs.fail();
+            std::cerr << "Failed to open '" << filename << "'.\n" << std::endl;
+            std::cout << "Skipping '" << filename << "'...\n" << std::endl;
+            continue;
         }
 
+        bool bSuccess = false;
+        auto raw_filename = const_cast<char *>(filename.c_str());
         auto filetype = filetypes::DetermineFiletype(ifs);
         switch (filetype)
         {
             case filetypes::unsupported:
             {
-                std::cout << "Filetype not supported." << " " << filetype << "\n"
-                          << "Skipping '" << filename << "'." << std::endl;
-                break;
+                std::cerr << "Filetype not supported." << " " << filetype << std::endl;
+                std::cout << "Skipping '" << filename << "'...\n" << std::endl;
+                continue;
             }
             case filetypes::pe_x86:
             {
-                std::cout << "PE32" << std::endl;
-                pe32::ProcessPe32(filename);
+                std::cout << "PE32 detected\n";
+                bSuccess = pe32::ProcessPe32(raw_filename);
                 break;
             }
             case filetypes::pe_x86_64:
             {
-                std::cout << "PE32+ (x86_64)" << std::endl;
-                pe32::ProcessPe64(filename);
+                std::cout << "PE32+(x86_64) detected\n";
+                bSuccess = pe32::ProcessPe64(raw_filename);
                 break;
             }
             case filetypes::elf_x86:
             {
-                std::cout << "ELF x86" << std::endl;
-                elf::ProcessElf32(filename);
+                std::cout << "ELF x86 detected\n";
+                bSuccess = elf::ProcessElf32(raw_filename);
                 break;
             }
             case filetypes::elf_x86_64:
             {
-                std::cout << "ELF x86_64" << std::endl;
-                elf::ProcessElf64(filename);
+                std::cout << "ELF x86_64 detected\n";
+                bSuccess = elf::ProcessElf64(raw_filename);
                 break;
             }
         }
+
+        if (bSuccess) {
+            std::cout << "'" << filename << "' successfully processed.\n" << std::endl;
+        } else {
+            std::cout << "failed to process'" << filename << "'.\n" << std::endl;
+        }
+
     }
 
     return 0;

@@ -1,32 +1,38 @@
 #include "Pe32.hpp"
 
 #include <iostream>
+#include <fstream>
 #include <cstring>
 
-void pe32::ProcessPe32(char* filename) {
+[[nodiscard]]
+bool pe32::ProcessPe32(char* filename) {
 
-    FILE*               fp{nullptr};
-    Pe32Header          header{};
-    Pe32OptionalHeader  optional_header{};
+    Pe32Header          header;
+    Pe32OptionalHeader  optional_header;
 
     // Open target file
-    if (!(fp = fopen(filename, "rb+"))) {
+    std::fstream fs(filename, std::ios::binary | std::ios::in | std::ios::out);
+    if (!fs.is_open()) {
         std::cerr << "Failed to open '" << filename << "' for reading." << std::endl;
-        exit(errno);
+        return false;
     }
 
     // Get PE32 header
-    fseek(fp, sizeof(MsDosStub), SEEK_SET);
-    if ((fread(&header, sizeof(Pe32Header), 1, fp)) != 1) {
+    fs.seekg(sizeof(MsDosStub), std::ios::beg);
+    fs.read((char *)&header, sizeof(header));
+    if (fs.fail()) {
         std::cerr << "Failed to read header of '" << filename << "'." << std::endl;
-        exit(errno);
+        fs.close();
+        return false;
     }
 
     // Get optional header
-    fseek(fp, sizeof(Pe32Header) + sizeof(MsDosStub), SEEK_SET);
-    if ((fread(&optional_header, sizeof(Pe32OptionalHeader), 1, fp)) != 1) {
+    fs.seekg(sizeof(MsDosStub) + sizeof(Pe32Header), std::ios::beg);
+    fs.read((char *)&optional_header, sizeof(optional_header));
+    if (fs.fail()) {
         std::cerr << "Failed to read optional header of '" << filename << "'." << std::endl;
-        exit(errno);
+        fs.close();
+        return false;
     }
 
     /* Clear header */
@@ -72,17 +78,21 @@ void pe32::ProcessPe32(char* filename) {
     //optional_header.mNumberOfRvaAndSizes       = 0;  // Absolutely the fuck not
 
     // Set PE32 header
-    fseek(fp, sizeof(MsDosStub), SEEK_SET);
-    if ((fwrite(&header, sizeof(Pe32Header), 1, fp)) != 1) {
+    fs.seekg(sizeof(MsDosStub), std::ios::beg);
+    fs.write((char *)&header, sizeof(header));
+    if (fs.fail()) {
         std::cerr << "Failed to write header of '" << filename << "'." << std::endl;
-        exit(errno);
+        fs.close();
+        return false;
     }
 
     // Set optional header
-    fseek(fp, sizeof(MsDosStub) + sizeof(Pe32Header), SEEK_SET);
-    if ((fwrite(&optional_header, sizeof(Pe32OptionalHeader), 1, fp)) != 1) {
+    fs.seekg(sizeof(MsDosStub) + sizeof(Pe32Header), std::ios::beg);
+    fs.write((char *)&optional_header, sizeof(optional_header));
+    if (fs.fail()) {
         std::cerr << "Failed to write header of '" << filename << "'." << std::endl;
-        exit(errno);
+        fs.close();
+        return false;
     }
     
     // Zero out each section header
@@ -92,10 +102,12 @@ void pe32::ProcessPe32(char* filename) {
             header.mSizeOfOptionalHeader + i * sizeof(Pe32SectionHeader);
 
         // Get section header
-        fseek(fp, offset, SEEK_SET);
-        if ((fread(&section_header, sizeof(Pe32SectionHeader), 1, fp)) != 1) {
+        fs.seekg(offset, std::ios::beg);
+        fs.read((char *)&section_header, sizeof(section_header));
+        if (fs.fail()) {
             std::cerr << "Failed to read section header of '" << filename << "'." << std::endl;
-            exit(errno);
+            fs.close();
+            return false;
         }
 
         // Clear entries of section header
@@ -111,43 +123,48 @@ void pe32::ProcessPe32(char* filename) {
         //section_header.mCharacteristics      = 0;  // NOPE
         
         // Set section headers
-        fseek(fp, (long)offset, SEEK_SET);
-        if ((fwrite(&section_header, sizeof(section_header), 1, fp)) != 1) {
+        fs.seekg(offset, std::ios::beg);
+        fs.write((char *)&section_header, sizeof(section_header));
+        if (fs.fail()) {
             std::cerr << "Failed to write section header: '" << section_header.mName << "' of '" << filename << "'." << std::endl;
-            exit(errno);
+            fs.close();
+            return false;
         }
     }
 
-    std::cout << filename << " successfully processed." << std::endl;
-
-    fclose(fp);
-    return;
+    fs.close();
+    return true;
 }
 
-void pe32::ProcessPe64(char* filename) {
+[[nodiscard]]
+bool pe32::ProcessPe64(char* filename) {
 
-    FILE*               fp{nullptr};
-    Pe32Header          header{};
-    Pe32OptionalHeader  optional_header{};
+    Pe32Header              header;
+    Pe32PlusOptionalHeader  optional_header;
 
     // Open target file
-    if (!(fp = fopen(filename, "rb+"))) {
+    std::fstream fs(filename, std::ios::binary | std::ios::in | std::ios::out);
+    if (!fs.is_open()) {
         std::cerr << "Failed to open '" << filename << "' for reading." << std::endl;
-        exit(errno);
+        return false;
     }
 
     // Get PE32 header
-    fseek(fp, sizeof(MsDosStub), SEEK_SET);
-    if ((fread(&header, sizeof(Pe32Header), 1, fp)) != 1) {
+    fs.seekg(sizeof(MsDosStub), std::ios::beg);
+    fs.read((char *)&header, sizeof(header));
+    if (fs.fail()) {
         std::cerr << "Failed to read header of '" << filename << "'." << std::endl;
-        exit(errno);
+        fs.close();
+        return false;
     }
 
     // Get optional header
-    fseek(fp, sizeof(Pe32Header) + sizeof(MsDosStub), SEEK_SET);
-    if ((fread(&optional_header, sizeof(Pe32OptionalHeader), 1, fp)) != 1) {
+    fs.seekg(sizeof(MsDosStub) + sizeof(Pe32Header), std::ios::beg);
+    fs.read((char *)&optional_header, sizeof(optional_header));
+    if (fs.fail()) {
         std::cerr << "Failed to read optional header of '" << filename << "'." << std::endl;
-        exit(errno);
+        fs.close();
+        return false;
     }
 
     /* Clear header */
@@ -169,7 +186,6 @@ void pe32::ProcessPe64(char* filename) {
     optional_header.mSizeOfUninitializedData     = 0;  // OK
     //optional_header.mAddressOfEntryPoint       = 0;  // NOPE
     optional_header.mBaseOfCode                  = 0;  // OK
-    //optional_header.mBaseOfData                = 0;  // Sometimes but no
     //optional_header.mImageBase                 = 0;  // FUCK NO
     //optional_header.mSectionAlignment          = 0;  // NOPE
     //optional_header.mFileAlignment             = 0;  // NOOOOOOPE
@@ -193,17 +209,21 @@ void pe32::ProcessPe64(char* filename) {
     //optional_header.mNumberOfRvaAndSizes       = 0;  // Absolutely the fuck not
 
     // Set PE32 header
-    fseek(fp, sizeof(MsDosStub), SEEK_SET);
-    if ((fwrite(&header, sizeof(Pe32Header), 1, fp)) != 1) {
+    fs.seekg(sizeof(MsDosStub), std::ios::beg);
+    fs.write((char *)&header, sizeof(header));
+    if (fs.fail()) {
         std::cerr << "Failed to write header of '" << filename << "'." << std::endl;
-        exit(errno);
+        fs.close();
+        return false;
     }
 
     // Set optional header
-    fseek(fp, sizeof(MsDosStub) + sizeof(Pe32Header), SEEK_SET);
-    if ((fwrite(&optional_header, sizeof(Pe32OptionalHeader), 1, fp)) != 1) {
+    fs.seekg(sizeof(MsDosStub) + sizeof(Pe32Header), std::ios::beg);
+    fs.write((char *)&optional_header, sizeof(optional_header));
+    if (fs.fail()) {
         std::cerr << "Failed to write header of '" << filename << "'." << std::endl;
-        exit(errno);
+        fs.close();
+        return false;
     }
 
     // Zero out each section header
@@ -213,10 +233,12 @@ void pe32::ProcessPe64(char* filename) {
             header.mSizeOfOptionalHeader + i * sizeof(Pe32SectionHeader);
 
         // Get section header
-        fseek(fp, offset, SEEK_SET);
-        if ((fread(&section_header, sizeof(Pe32SectionHeader), 1, fp)) != 1) {
+        fs.seekg(offset, std::ios::beg);
+        fs.read((char *)&section_header, sizeof(section_header));
+        if (fs.fail()) {
             std::cerr << "Failed to read section header of '" << filename << "'." << std::endl;
-            exit(errno);
+            fs.close();
+            return false;
         }
 
         // Clear entries of section header
@@ -232,15 +254,15 @@ void pe32::ProcessPe64(char* filename) {
         //section_header.mCharacteristics      = 0;  // NOPE
         
         // Set section headers
-        fseek(fp, (long)offset, SEEK_SET);
-        if ((fwrite(&section_header, sizeof(section_header), 1, fp)) != 1) {
+        fs.seekg(offset, std::ios::beg);
+        fs.write((char *)&section_header, sizeof(section_header));
+        if (fs.fail()) {
             std::cerr << "Failed to write section header: '" << section_header.mName << "' of '" << filename << "'." << std::endl;
-            exit(errno);
+            fs.close();
+            return false;
         }
     }
 
-    std::cout << filename << " successfully processed." << std::endl;
-
-    fclose(fp);
-    return;
+    fs.close();
+    return true;
 }

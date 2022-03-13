@@ -4,9 +4,14 @@
 # Created:    March 9th, 2022
 # Creator:    March 10th, 2022
 
-declare -a objects=("Tests/ELF/elf_x86.exe" "Tests/ELF/elf_x86_64.exe")
-vpr="vpr.txt"
-yellowbyte="yellowbyte.txt"
+declare -a objects=("Tests/PE/pe_x86.exe"
+                    "Tests/PE/pe_x86_64.exe"
+                    "Tests/ELF/elf_x86.exe"
+                    "Tests/ELF/elf_x86_64.exe")
+
+oz="omega-zero.txt"
+original="original.txt"
+results="results.txt"
 
 if ! [ -f ./Bin/vpr-omega-zero ];
 then
@@ -17,25 +22,17 @@ make tests
 for i in "${objects[@]}"
 do
     ./Bin/vpr-omega-zero "${i}"
-    objdump -fs "${i}"   >> "${vpr}"
-    readelf -lh "${i}"   >> "${vpr}"
+    objdump -fs --section-headers "${i}" >> "${oz}"
 done
-
-if ! [ -f ./zeroSection2.py ];
-then
-    wget https://raw.githubusercontent.com/yellowbyte/reverse-engineering-playground/master/file_format_hacks/zeroSection2.py
-fi
 
 make tests
 for i in "${objects[@]}"
 do
-    python2 ./zeroSection2.py "${i}"
-    objdump -fs "${i}"     >> "${yellowbyte}"
-    readelf -lh "${i}"     >> "${yellowbyte}"
+    objdump -fs --section-headers "${i}" >> "${original}"
 done
 
-diff ${vpr} ${yellowbyte} -q
-diff ${vpr} ${yellowbyte} | wc
+diff ${oz} ${original} > ${results}
+diff ${oz} ${original} | wc
 
-rm zeroSection2.py
-rm ${vpr} ${yellowbyte}
+rm ${oz} ${original}
+#rm ${results}
