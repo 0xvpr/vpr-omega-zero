@@ -63,8 +63,8 @@ namespace pe32 {
         uint32_t mSizeOfInitializedData;
         uint32_t mSizeOfUninitializedData;
         uint32_t mAddressOfEntryPoint;
-        uint64_t mBaseOfCode;
-        uint32_t mImageBase;
+        uint32_t mBaseOfCode;
+        uint64_t mImageBase;
         uint32_t mSectionAlignment;
         uint32_t mFileAlignment;
         uint16_t mMajorOperatingSystemVersion;
@@ -79,10 +79,10 @@ namespace pe32 {
         uint32_t mCheckSum;
         uint16_t mSubsystem;
         uint16_t mDllCharacteristics;
-        uint32_t mSizeOfStackReserve;
-        uint32_t mSizeOfStackCommit;
-        uint32_t mSizeOfHeapReserve;
-        uint32_t mSizeOfHeapCommit;
+        uint64_t mSizeOfStackReserve;
+        uint64_t mSizeOfStackCommit;
+        uint64_t mSizeOfHeapReserve;
+        uint64_t mSizeOfHeapCommit;
         uint32_t mLoaderFlags;
         uint32_t mNumberOfRvaAndSizes;
     } Pe32PlusOptionalHeader;
