@@ -1,5 +1,5 @@
 -std=c++2a
--IIncludes
+-Iinclude
 -Wall
 -Wextra
 -Werror

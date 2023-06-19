@@ -13,11 +13,11 @@
  *     section-header information of x86 and x86_64 ELF and PE32 binaries.
 **/
 
-#include "Filetypes.hpp"   // namespace filetypes
-#include "Parser.hpp"      // namespace parser
-#include "Util.hpp"        // __usage_error
-#include "Pe32.hpp"        // namespace pe32
-#include "Elf.hpp"         // namespace elf
+#include "filetypes.hpp"   // namespace filetypes
+#include "parser.hpp"      // namespace parser
+#include "util.hpp"        // __usage_error
+#include "pe32.hpp"        // namespace pe32
+#include "elf.hpp"         // namespace elf
 
 #include <filesystem>
 #include <iostream>

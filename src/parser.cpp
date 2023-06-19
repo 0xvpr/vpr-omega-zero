@@ -1,4 +1,4 @@
-#include "Parser.hpp"
+#include "parser.hpp"
 
 static file_arr_t SetFilenames(int argc, char** argv) {
 

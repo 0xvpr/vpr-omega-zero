@@ -1,4 +1,4 @@
-#include "Util.hpp"
+#include "util.hpp"
 
 void __usage_error(char* argv_0, int error_code) {
     std::cerr << "Usage error " << error_code << ": " << [&error_code]() -> std::string {

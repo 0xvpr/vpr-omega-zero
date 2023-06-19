@@ -35,8 +35,8 @@
 # Exclude Folders
 venv
 env
-Bin
-Build
+bin
+build
 
 # Exclude Compiled Files
 *.a

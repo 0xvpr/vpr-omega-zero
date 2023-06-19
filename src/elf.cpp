@@ -1,6 +1,6 @@
-#include "Elf.hpp"
+#include "elf.hpp"
 
-#include "Filetypes.hpp"
+#include "filetypes.hpp"
 
 #include <iostream>
 #include <fstream>

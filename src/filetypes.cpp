@@ -1,5 +1,5 @@
-#include "Filetypes.hpp"
-#include "Pe32.hpp"
+#include "filetypes.hpp"
+#include "pe32.hpp"
 
 #include <iostream>
 
