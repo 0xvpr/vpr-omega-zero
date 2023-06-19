@@ -6,7 +6,7 @@
   <a href="https://mit-license.org/"/>
     <img src="https://img.shields.io/badge/License-MIT-44CC11"/>
   </a>
-  <img src="https://img.shields.io/github/actions/workflow/status/0xvpr/vpr-omega-zero/docker_build.yml?label=Build"/>
+  <img src="https://img.shields.io/github/actions/workflow/status/0xvpr/vpr-omega-zero/build.yml?label=Build"/>
 </p>
 <h3 align="center">Inspired by yellobytes's <a href="https://github.com/yellowbyte/reverse-engineering-playground/tree/master/file_format_hacks">zeroSection2.py</a></h3>
 <br>
