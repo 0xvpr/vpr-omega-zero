@@ -1,0 +1,45 @@
+name: Builds (CMake)
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  ubuntu_latest_build_cmake_gcc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create CMake cache
+        run: cmake -B build
+
+      - name: Build and link objects
+        run: cmake --build build --config Release
+
+  windows_latest_build_cmake_msvc:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create CMake cache
+        run: cmake -B build
+
+      - name: Build and link objects
+        run: cmake --build build --config Release
+
+  mac_latest_build_cmake_apple_clang:
+    runs-on: macOS-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create CMake cache
+        run: cmake -B build
+
+      - name: Build and link objects
+        run: cmake --build build --config Release

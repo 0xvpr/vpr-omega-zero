@@ -1,4 +1,4 @@
-#include "Pe32.hpp"
+#include "pe32.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -194,11 +194,11 @@ bool pe32::ProcessPe64(char* filename) {
     optional_header.mMajorImageVersion           = 0;  // OK
     optional_header.mMinorImageVersion           = 0;  // OK
     //optional_header.mMajorSubsystemVersion     = 0;  // needs specific value
-    optional_header.mMinorSubsystemVersion       = 0;  // OK
+    //optional_header.mMinorSubsystemVersion     = 0;  // Sometimes OK so probably not
     //optional_header.mWin32VersionValue         = 0;  // OK but probably not
     //optional_header.mSizeOfImage               = 0;  // NOPE
     //optional_header.mSizeOfHeaders             = 0;  // NOPE
-    optional_header.mCheckSum                    = 0;  // OK probably not good
+    optional_header.mCheckSum                    = 0;  // OK probably not good to change
     //optional_header.mSubsystem                 = 0;  // nah
     //optional_header.mDllCharacteristics        = 0;  // hmmmm... maybe but probably not
     optional_header.mSizeOfStackReserve          = 0;  // OK
