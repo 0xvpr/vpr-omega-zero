@@ -7,24 +7,24 @@ set( CMAKE_CXX_STANDARD 20 )
 
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
 
-set( INCLUDE ${CMAKE_SOURCE_DIR}/include )
-include_directories( ${INCLUDE} )
+set( INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include )
+include_directories( ${PROJECT_NAME} ${INCLUDE_DIR} )
 
-set( SOURCE ${CMAKE_SOURCE_DIR}/src )
+set( SOURCE_DIR ${CMAKE_SOURCE_DIR}/src )
 set( SOURCES
     # CXX Sources
-    ${SOURCE}/elf.cpp
-    ${SOURCE}/filetypes.cpp
-    ${SOURCE}/main.cpp
-    ${SOURCE}/parser.cpp
-    ${SOURCE}/pe32.cpp
-    ${SOURCE}/util.cpp
+    ${SOURCE_DIR}/elf.cpp
+    ${SOURCE_DIR}/filetypes.cpp
+    ${SOURCE_DIR}/main.cpp
+    ${SOURCE_DIR}/parser.cpp
+    ${SOURCE_DIR}/pe32.cpp
+    ${SOURCE_DIR}/util.cpp
     # CXX Headers
-    ${INCLUDE}/elf.hpp
-    ${INCLUDE}/filetypes.hpp
-    ${INCLUDE}/parser.hpp
-    ${INCLUDE}/pe32.hpp
-    ${INCLUDE}/util.hpp
+    ${INCLUDE_DIR}/elf.hpp
+    ${INCLUDE_DIR}/filetypes.hpp
+    ${INCLUDE_DIR}/parser.hpp
+    ${INCLUDE_DIR}/pe32.hpp
+    ${INCLUDE_DIR}/util.hpp
 )
 
 add_executable( ${PROJECT_NAME} ${SOURCES} )

@@ -1,6 +1,7 @@
 #include "parser.hpp"
 
-static file_arr_t SetFilenames(int argc, char** argv) {
+static
+file_arr_t SetFilenames(int argc, char** argv) {
 
     if (argc < 2) {
         return { };
@@ -25,7 +26,8 @@ static file_arr_t SetFilenames(int argc, char** argv) {
 
 }
 
-static u_int32_t SetOperations(int argc, char** argv) {
+static
+uint32_t SetOperations(int argc, char** argv) {
     (void)argc;
     (void)argv;
     return 0;
