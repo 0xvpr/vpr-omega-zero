@@ -11,12 +11,12 @@ OBJ       = Build
 BUILD     = Build
 SOURCE    = Sources
 
-SOURCES   = $(wildcard $(SOURCE)/*.cpp)
-DEBUG     = $(patsubst $(SOURCE)/%.cpp,$(OBJ)/debug/%.obj,$(SOURCES))
-RELEASE   = $(patsubst $(SOURCE)/%.cpp,$(OBJ)/release/%.obj,$(SOURCES))
+SOURCES  := $(wildcard $(SOURCE)/*.cpp)
+DEBUG    := $(patsubst $(SOURCE)/%.cpp,$(OBJ)/debug/%.obj,$(SOURCES))
+RELEASE  := $(patsubst $(SOURCE)/%.cpp,$(OBJ)/release/%.obj,$(SOURCES))
 
 INCLUDE   = Includes
-INCLUDES  = $(addprefix -I,$(INCLUDE))
+INCLUDES := $(addprefix -I,$(INCLUDE))
 
 ifeq ($(PREFIX),)
 PREFIX    = /usr/local
@@ -26,7 +26,7 @@ MAKEFLAGS += -j$(shell nproc)
 
 all: debug
 
-debug:   CFLAGS  += -g
+debug:   CFLAGS  += -g -DDEBUG
 release: CFLAGS  += -DRELEASE -O3 -fno-ident -ffast-math -fvisibility=hidden
 release: LDFLAGS += -s
 
