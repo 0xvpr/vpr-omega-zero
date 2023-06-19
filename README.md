@@ -26,11 +26,21 @@ chmod +x docker-start.sh && ./docker-start.sh
 ```
 
 ## Build instructions
+Linux/WSL/MSYS/macOS
 ```bash
-git clone https://github.com/0xvpr/vpr-omega-zero
-cd vpr-omega-zero
-make
-sudo make install # if you want it available globally
+git clone https://github.com/0xvpr/vpr-bin2fmt vpr-bin2fmt
+cd vpr-bin2fmt
+cmake -B build
+cmake --build build
+# sudo cmake --build build --target install # uncomment if you want it available globally
+```
+Windows
+```powershell
+git clone https://github.com/0xvpr/vpr-bin2fmt vpr-bin2fmt
+cd vpr-bin2fmt
+cmake.exe -B build
+cmake.exe --build build
+# cmake.exe --build build --target install # uncomment if you want it available globally
 ```
 
 ## Example Usage
@@ -40,5 +50,5 @@ vpr-omega-zero path/to/executable [ path/to/other/executable ]
 
 ## Testing (Needs improvement)
 ```bash
-chmod +x compare.sh && ./compare.sh
+# chmod +x compare.sh && ./compare.sh # deprecated
 ```
