@@ -5,7 +5,7 @@
  * Created:     March 9th, 2022
  *
  * Updated by:  March 9th, 2022
- * Updated:     March 14th, 2025
+ * Updated:     March 15th, 2025
  *
  * Description: Inspired by yellobytes's 'zeroSection2.py'
  *              https://github.com/yellowbyte/reverse-engineering-playground/tree/master/file_format_hacks
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 {
     if (argc < 2)
     {
-        __usage_error(argv[0], "Insufficient arguments.");
+        __usage_error(argv[0], "insufficient arguments");
     }
 
     bool use_default = 1;
@@ -45,8 +45,9 @@ int main(int argc, char** argv)
                 {
                 case 'a': use_default = 0; flags.zero_all      = 1; break;
                 case 's': use_default = 0; flags.zero_sections = 1; break;
-                case 'h': use_default = 0; flags.zero_headers  = 1; break;
-                default: fprintf(stderr, "unknown option: %c\n", argv[i][j]); exit(1); break;
+                case 'H': use_default = 0; flags.zero_headers  = 1; break;
+                case 'h': __usage_error(argv[0], "display help");   break;
+                default:  fprintf(stderr, "unknown option: %c\n", argv[i][j]); break;
                 }
             }
         }
@@ -62,6 +63,11 @@ int main(int argc, char** argv)
         flags.zero_all = 1;
     }
 
+    if (!n_filenames)
+    {
+        __usage_error(argv[0], "no files supplied");
+    }
+
     for (size_t i = 0; i < n_filenames; ++i)
     {
         const char* const filename = filenames[i];
@@ -70,9 +76,7 @@ int main(int argc, char** argv)
         FILE* fp = 0;
         if ( !(fp = fopen(filename, "rb")) )
         {
-            /*std::cerr << "'" << filename << "' does not exist." << std::endl;*/
-            /*std::cout << "Skipping '" << filename << "'...\n" << std::endl;*/
-            fprintf(stderr, "failed to open '%s'.\n", filename);
+            fprintf(stderr, "Failed to open '%s'.\n", filename);
             fprintf(stdout, "Skipping '%s'...\n", filename);
             continue;
         }
@@ -115,9 +119,9 @@ int main(int argc, char** argv)
         }
 
         if (bSuccess) {
-            fprintf(stdout, "'%s' successfully processed.\n", filename);
+            fprintf(stdout, "'%s' was successfully processed.\n", filename);
         } else {
-            fprintf(stdout, "failed to process '%s'.\n", filename);
+            fprintf(stdout, "Failed to process '%s'.\n", filename);
         }
 
     }

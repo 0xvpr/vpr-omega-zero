@@ -12,6 +12,12 @@ set_target_properties(
         PREFIX vpr-
 )
 
+add_compile_definitions(
+    VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
+    VERSION_MINOR=${PROJECT_VERSION_MINOR}
+    VERSION_PATCH=${PROJECT_VERSION_PATCH}
+)
+
 target_compile_options(
     ${PROJECT_NAME}
     PRIVATE $<$<C_COMPILER_ID:MSVC>:/W4>
