@@ -14,7 +14,7 @@
 This project aims to provide a tool for the stripping of the  
 section-header information of 32/64 bit ELF and PE32 executables.
 
-## Building with a Docker Environment
+## Building with Docker (recommended)
 ```
 # Download repo
 git clone https://github.com/0xvpr/vpr-omega-zero
@@ -24,30 +24,42 @@ cd vpr-omega-zero
 chmod +x docker-build.sh && ./docker-build.sh
 ```
 
-## Build instructions
-Linux/WSL/MSYS/macOS
+## Build instructions (local)
+Windows/Linux/WSL/MSYS/macOS
 ```bash
-git clone https://github.com/0xvpr/vpr-bin2fmt vpr-bin2fmt
-cd vpr-bin2fmt
+git clone https://github.com/0xvpr/vpr-omega-zero vpr-omega-zero
+cd vpr-omega-zero
 cmake -B build
 cmake --build build
-# sudo cmake --build build --target install # uncomment if you want it available globally
-```
-Windows
-```powershell
-git clone https://github.com/0xvpr/vpr-bin2fmt vpr-bin2fmt
-cd vpr-bin2fmt
-cmake.exe -B build
-cmake.exe --build build
-# cmake.exe --build build --target install # uncomment if you want it available globally
 ```
 
 ## Example Usage
 ```bash
-vpr-omega-zero path/to/executable [ path/to/other/executable ]
+Usage:
+  vpr-omega-zero.exe [<optional_arguments>] <path/to/executable-1> <path/to/executable-2>
+
+Optional arguments:
+  -a,                Enable all flags. (default option)
+  --all
+  -o,                Zero all optional headers.
+  --optional-headers
+  -s,                Zero all section headers.
+  --section-headers
+  -H                 Zero all headers.
+  -headers
+  -h,                Display help.
+  --help
+
+Examples:
+  vpr-omega-zero.exe path/to/executable
+  vpr-omega-zero.exe -sH path/to/executable
+
+Version:
+  1.1.0
+
+Author:
+  VPR
 ```
 
-## Testing TODO
-```bash
-# chmod +x compare.sh && ./compare.sh # deprecated
-```
+#### Testing
+[ TODO ]
