@@ -4,9 +4,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "filetypes.h"
 #include "flags.h"
 
+//
 // Structs
+//
+
 typedef struct _ElfHeader32 {
     uint8_t  e_magic[16];
     uint16_t e_type;
@@ -41,21 +45,18 @@ typedef struct _ElfHeader64 {
     uint16_t e_shstrndx;
 } ElfHeader64;
 
+//
 // Functions
-/**
- * Perform scraping of 32 bit ELF binary.
- *
- * @param    filename
- * @return   success
-**/
-bool process_elf32(const char * restrict, const flags_ptr_t);
+//
 
 /**
- * Perform scraping of 64 bit ELF binary.
+ * Perform processing of a 32/64 bit ELF binary.
  *
  * @param    filename
+ * @param    flags
+ * @param    arch
  * @return   success
 **/
-bool process_elf64(const char * restrict, const flags_ptr_t);
+bool process_elf(const char* restrict filename, flags_ptr_t flags, enum filetype_t arch);
 
 #endif // ELF_HEADER

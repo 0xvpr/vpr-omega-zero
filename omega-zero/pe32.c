@@ -11,9 +11,20 @@ typedef union {
     Pe32PlusOptionalHeader header64;
 } pe32_union_t;
 
-bool process_pe32(const char* restrict filename, const flags_ptr_t flags, enum filetype_t arch)
+bool process_pe32( const char* restrict  filename,
+                   const flags_ptr_t     flags,
+                   enum filetype_t       arch )
 {
     assert((arch == pe_x86) || (arch == pe_x86_64));
+
+    if ( !( flags->zero_all             ||
+            flags->zero_headers         ||
+            flags->zero_section_headers ||
+            flags->zero_optional_headers ) )
+    {
+        fprintf(stderr, "No processing for '%s' to be completed.\n", filename);
+        return 0;
+    }
 
     Pe32Header   header = { 0 };
     pe32_union_t optional_header_u;
@@ -28,142 +39,142 @@ bool process_pe32(const char* restrict filename, const flags_ptr_t flags, enum f
         return false;
     }
 
-    // Get PE32 header
-    fseek(fp, sizeof(MsDosStub), SEEK_SET);
-    if ( ( fread((char *)&header, sizeof(header), 1, fp)) != 1)
+    bool zero_headers = flags->zero_all || flags->zero_headers;
+    if (zero_headers)
     {
-        fprintf(stderr, "Failed to read header of '%s'.\n", filename);
-        fclose(fp);
-        return false;
+        // Get PE32 header
+        fseek(fp, sizeof(MsDosStub), SEEK_SET);
+        if ( ( fread((char *)&header, sizeof(header), 1, fp)) != 1)
+        {
+            fprintf(stderr, "Failed to read header of '%s'.\n", filename);
+            fclose(fp);
+            return false;
+        }
+
+        //
+        // Clear header
+        //
+
+        //header.mMagic                = 0;  // NOPE
+        //header.mMachine              = 0;  // NOPE
+        header.mTimeDateStamp          = 0;  // OK
+        //header.mNumberOfSymbols      = 0;  // NOPE
+        //header.mCharacteristics      = 0;  // NOPE
+        //header.mNumberOfSections     = 0;  // MAYBE - if mNumberOfSections is saved before clearing
+        //header.mSizeOfOptionalHeader = 0;  // NOPE
+        header.mPointerToSymbolTable   = 0;  // OK
+
+        // Set PE32 header
+        fseek(fp, sizeof(MsDosStub), SEEK_SET);
+        if ( fwrite((char *)&header, sizeof(header), 1, fp) != 1 )
+        {
+            fprintf(stderr, "Failed to write header of '%s'.\n", filename);
+            fclose(fp);
+            return false;
+        }
     }
 
-    // Get optional header
-    fseek(fp, sizeof(MsDosStub) + sizeof(Pe32Header), SEEK_SET);
-    if ( fread((char *)&optional_header_u, optional_header_size, 1, fp) != 1)
+    bool zero_optional_headers = flags->zero_all || flags->zero_optional_headers;
+    if (zero_optional_headers)
     {
-        fprintf(stderr, "Failed to read optional header of '%s'.\n", filename);
-        fclose(fp);
-        return false;
-    }
+        // Get optional header
+        fseek(fp, sizeof(MsDosStub) + sizeof(Pe32Header), SEEK_SET);
+        if ( fread((char *)&optional_header_u, optional_header_size, 1, fp) != 1)
+        {
+            fprintf(stderr, "Failed to read optional header of '%s'.\n", filename);
+            fclose(fp);
+            return false;
+        }
 
-    //
-    // Clear header
-    //
+        // Clear Optional Header
+        if (arch == pe_x86) // 32 bit
+        {
+            //optional_header_u.header32.mMagic                     = 0;  // NOPE
+            optional_header_u.header32.mMajorLinkerVersion          = 0;  // OK
+            optional_header_u.header32.mMinorLinkerVersion          = 0;  // OK
+            optional_header_u.header32.mSizeOfCode                  = 0;  // OK
+            optional_header_u.header32.mSizeOfInitializedData       = 0;  // OK
+            optional_header_u.header32.mSizeOfUninitializedData     = 0;  // OK
+            //optional_header_u.header32.mAddressOfEntryPoint       = 0;  // NOPE
+            optional_header_u.header32.mBaseOfCode                  = 0;  // OK
+            optional_header_u.header32.mBaseOfData                  = 0;  // OK
+            //optional_header_u.header32.mImageBase                 = 0;  // FUCK NO
+            //optional_header_u.header32.mSectionAlignment          = 0;  // NOPE
+            //optional_header_u.header32.mFileAlignment             = 0;  // NO
+            optional_header_u.header32.mMajorOperatingSystemVersion = 0;  // OK
+            optional_header_u.header32.mMinorOperatingSystemVersion = 0;  // OK
+            optional_header_u.header32.mMajorImageVersion           = 0;  // OK
+            optional_header_u.header32.mMinorImageVersion           = 0;  // OK
+            //optional_header_u.header32.mMajorSubsystemVersion     = 0;  // needs specific value
+            optional_header_u.header32.mMinorSubsystemVersion       = 0;  // OK
+            //optional_header_u.header32.mWin32VersionValue         = 0;  // OK but probably not
+            //optional_header_u.header32.mSizeOfImage               = 0;  // NOPE
+            //optional_header_u.header32.mSizeOfHeaders             = 0;  // NOPE
+            optional_header_u.header32.mCheckSum                    = 0;  // OK
+            //optional_header_u.header32.mSubsystem                 = 0;  // nah
+            //optional_header_u.header32.mDllCharacteristics        = 0;  // hmmmm... maybe but probably not
+            optional_header_u.header32.mSizeOfStackReserve          = 0;  // OK
+            optional_header_u.header32.mSizeOfStackCommit           = 0;  // OK
+            optional_header_u.header32.mSizeOfHeapReserve           = 0;  // OK
+            optional_header_u.header32.mSizeOfHeapCommit            = 0;  // OK
+            optional_header_u.header32.mLoaderFlags                 = 0;  // OK but probably not
+            //optional_header_u.header32.mNumberOfRvaAndSizes       = 0;  // Absolutely the fuck not
+        }
+        else // 64 bit
+        {
+            //optional_header_u.header32.mMagic                     = 0;  // NOPE
+            optional_header_u.header64.mMajorLinkerVersion          = 0;  // OK
+            optional_header_u.header64.mMinorLinkerVersion          = 0;  // OK
+            optional_header_u.header64.mSizeOfCode                  = 0;  // OK
+            optional_header_u.header64.mSizeOfInitializedData       = 0;  // OK
+            optional_header_u.header64.mSizeOfUninitializedData     = 0;  // OK
+            //optional_header_u.header64.mAddressOfEntryPoint       = 0;  // NOPE
+            optional_header_u.header64.mBaseOfCode                  = 0;  // OK
+            //optional_header_u.header64.mImageBase                 = 0;  // FUCK NO
+            //optional_header_u.header64.mSectionAlignment          = 0;  // NOPE
+            //optional_header_u.header64.mFileAlignment             = 0;  // NO
+            optional_header_u.header64.mMajorOperatingSystemVersion = 0;  // OK
+            optional_header_u.header64.mMinorOperatingSystemVersion = 0;  // OK
+            optional_header_u.header64.mMajorImageVersion           = 0;  // OK
+            optional_header_u.header64.mMinorImageVersion           = 0;  // OK
+            //optional_header_u.header64.mMajorSubsystemVersion     = 0;  // needs specific value
+            optional_header_u.header64.mMinorSubsystemVersion       = 0;  // OK
+            //optional_header_u.header64.mWin32VersionValue         = 0;  // OK but probably not
+            //optional_header_u.header64.mSizeOfImage               = 0;  // NOPE
+            //optional_header_u.header64.mSizeOfHeaders             = 0;  // NOPE
+            optional_header_u.header64.mCheckSum                    = 0;  // OK
+            //optional_header_u.header64.mSubsystem                 = 0;  // nah
+            //optional_header_u.header64.mDllCharacteristics        = 0;  // hmmmm... maybe but probably not
+            optional_header_u.header64.mSizeOfStackReserve          = 0;  // OK
+            optional_header_u.header64.mSizeOfStackCommit           = 0;  // OK
+            optional_header_u.header64.mSizeOfHeapReserve           = 0;  // OK
+            optional_header_u.header64.mSizeOfHeapCommit            = 0;  // OK
+            optional_header_u.header64.mLoaderFlags                 = 0;  // OK but probably not
+            //optional_header_u.header32.mNumberOfRvaAndSizes       = 0;  // Absolutely the fuck not
+        }
 
-    bool zero_headers =
-        !(flags->zero_all || flags->zero_headers);
-    //header.mMagic                *= zero_headers;  // NOPE
-    //header.mMachine              *= zero_headers;  // NOPE
-    header.mTimeDateStamp          *= zero_headers;  // OK
-    //header.mNumberOfSymbols      *= zero_headers;  // NOPE
-    //header.mCharacteristics      *= zero_headers;  // NOPE
-    //header.mNumberOfSections     *= zero_headers;  // MAYBE - if mNumberOfSections is saved before clearing
-    //header.mSizeOfOptionalHeader *= zero_headers;  // NOPE
-    header.mPointerToSymbolTable   *= zero_headers;  // OK
-
-    //
-    // Clear Optional Header
-    //
-
-    bool zero_sections =
-        !(flags->zero_all || flags->zero_sections);
-    if (arch == pe_x86) // 32 bit
-    {
-        //optional_header_u.header32.mMagic                     *= zero_sections;  // NOPE
-        optional_header_u.header32.mMajorLinkerVersion          *= zero_sections;  // OK
-        optional_header_u.header32.mMinorLinkerVersion          *= zero_sections;  // OK
-        optional_header_u.header32.mSizeOfCode                  *= zero_sections;  // OK
-        optional_header_u.header32.mSizeOfInitializedData       *= zero_sections;  // OK
-        optional_header_u.header32.mSizeOfUninitializedData     *= zero_sections;  // OK
-        //optional_header_u.header32.mAddressOfEntryPoint       *= zero_sections;  // NOPE
-        optional_header_u.header32.mBaseOfCode                  *= zero_sections;  // OK
-        optional_header_u.header32.mBaseOfData                  *= zero_sections;  // OK
-        //optional_header_u.header32.mImageBase                 *= zero_sections;  // FUCK NO
-        //optional_header_u.header32.mSectionAlignment          *= zero_sections;  // NOPE
-        //optional_header_u.header32.mFileAlignment             *= zero_sections;  // NO
-        optional_header_u.header32.mMajorOperatingSystemVersion *= zero_sections;  // OK
-        optional_header_u.header32.mMinorOperatingSystemVersion *= zero_sections;  // OK
-        optional_header_u.header32.mMajorImageVersion           *= zero_sections;  // OK
-        optional_header_u.header32.mMinorImageVersion           *= zero_sections;  // OK
-        //optional_header_u.header32.mMajorSubsystemVersion     *= zero_sections;  // needs specific value
-        optional_header_u.header32.mMinorSubsystemVersion       *= zero_sections;  // OK
-        //optional_header_u.header32.mWin32VersionValue         *= zero_sections;  // OK but probably not
-        //optional_header_u.header32.mSizeOfImage               *= zero_sections;  // NOPE
-        //optional_header_u.header32.mSizeOfHeaders             *= zero_sections;  // NOPE
-        optional_header_u.header32.mCheckSum                    *= zero_sections;  // OK
-        //optional_header_u.header32.mSubsystem                 *= zero_sections;  // nah
-        //optional_header_u.header32.mDllCharacteristics        *= zero_sections;  // hmmmm... maybe but probably not
-        optional_header_u.header32.mSizeOfStackReserve          *= zero_sections;  // OK
-        optional_header_u.header32.mSizeOfStackCommit           *= zero_sections;  // OK
-        optional_header_u.header32.mSizeOfHeapReserve           *= zero_sections;  // OK
-        optional_header_u.header32.mSizeOfHeapCommit            *= zero_sections;  // OK
-        optional_header_u.header32.mLoaderFlags                 *= zero_sections;  // OK but probably not
-        //optional_header_u.header32.mNumberOfRvaAndSizes       *= zero_sections;  // Absolutely the fuck not
-    }
-    else // 64 bit
-    {
-        //optional_header_u.header32.mMagic                     *= zero_sections;  // NOPE
-        optional_header_u.header64.mMajorLinkerVersion          *= zero_sections;  // OK
-        optional_header_u.header64.mMinorLinkerVersion          *= zero_sections;  // OK
-        optional_header_u.header64.mSizeOfCode                  *= zero_sections;  // OK
-        optional_header_u.header64.mSizeOfInitializedData       *= zero_sections;  // OK
-        optional_header_u.header64.mSizeOfUninitializedData     *= zero_sections;  // OK
-        //optional_header_u.header64.mAddressOfEntryPoint       *= zero_sections;  // NOPE
-        optional_header_u.header64.mBaseOfCode                  *= zero_sections;  // OK
-        //optional_header_u.header64.mImageBase                 *= zero_sections;  // FUCK NO
-        //optional_header_u.header64.mSectionAlignment          *= zero_sections;  // NOPE
-        //optional_header_u.header64.mFileAlignment             *= zero_sections;  // NO
-        optional_header_u.header64.mMajorOperatingSystemVersion *= zero_sections;  // OK
-        optional_header_u.header64.mMinorOperatingSystemVersion *= zero_sections;  // OK
-        optional_header_u.header64.mMajorImageVersion           *= zero_sections;  // OK
-        optional_header_u.header64.mMinorImageVersion           *= zero_sections;  // OK
-        //optional_header_u.header64.mMajorSubsystemVersion     *= zero_sections;  // needs specific value
-        optional_header_u.header64.mMinorSubsystemVersion       *= zero_sections;  // OK
-        //optional_header_u.header64.mWin32VersionValue         *= zero_sections;  // OK but probably not
-        //optional_header_u.header64.mSizeOfImage               *= zero_sections;  // NOPE
-        //optional_header_u.header64.mSizeOfHeaders             *= zero_sections;  // NOPE
-        optional_header_u.header64.mCheckSum                    *= zero_sections;  // OK
-        //optional_header_u.header64.mSubsystem                 *= zero_sections;  // nah
-        //optional_header_u.header64.mDllCharacteristics        *= zero_sections;  // hmmmm... maybe but probably not
-        optional_header_u.header64.mSizeOfStackReserve          *= zero_sections;  // OK
-        optional_header_u.header64.mSizeOfStackCommit           *= zero_sections;  // OK
-        optional_header_u.header64.mSizeOfHeapReserve           *= zero_sections;  // OK
-        optional_header_u.header64.mSizeOfHeapCommit            *= zero_sections;  // OK
-        optional_header_u.header64.mLoaderFlags                 *= zero_sections;  // OK but probably not
-        //optional_header_u.header32.mNumberOfRvaAndSizes       *= zero_sections;  // Absolutely the fuck not
-    }
-
-    // Set PE32 header
-    fseek(fp, sizeof(MsDosStub), SEEK_SET);
-    if ( fwrite((char *)&header, sizeof(header), 1, fp) != 1 )
-    {
-        fprintf(stderr, "Failed to write header of '%s'.\n", filename);
-        fclose(fp);
-        return false;
-    }
-
-    // Set optional header
-    fseek(fp, sizeof(MsDosStub) + sizeof(Pe32Header), SEEK_SET);
-    if ( fwrite((char *)&optional_header_u, optional_header_size, 1, fp) != 1 )
-    {
-        fprintf(stderr, "Failed to write header of '%s'.\n", filename);
-        fclose(fp);
-        return false;
+        // Set optional header
+        fseek(fp, sizeof(MsDosStub) + sizeof(Pe32Header), SEEK_SET);
+        if ( fwrite((char *)&optional_header_u, optional_header_size, 1, fp) != 1 )
+        {
+            fprintf(stderr, "Failed to write header of '%s'.\n", filename);
+            fclose(fp);
+            return false;
+        }
     }
     
     //
-    // Zero out each section header name
+    // Zero out each section header
     //
     
-    bool zero_names = !(flags->zero_all || flags->zero_names);
-    if (!zero_names)
+    bool zero_section_headers = flags->zero_all || flags->zero_section_headers;
+    if (zero_section_headers)
     {
         for (unsigned i = 0; i < header.mNumberOfSections; i++) {
-            Pe32SectionHeader section_header;
+            Pe32SectionHeader section_header = { 0 };
             // Get section header
             long offset = (long)(sizeof(MsDosStub) + sizeof(Pe32Header) +
                 header.mSizeOfOptionalHeader + i * sizeof(Pe32SectionHeader));
-
             fseek(fp, offset, SEEK_SET);
             if ( fread((char *)&section_header, sizeof(section_header), 1, fp) != 1 )
             {
@@ -184,7 +195,7 @@ bool process_pe32(const char* restrict filename, const flags_ptr_t flags, enum f
             //section_header.mNumberOfLinenumbers  = 0;  // maybe
             //section_header.mCharacteristics      = 0;  // NOPE
             
-            // Set section headers
+            // Set section header
             fseek(fp, offset, SEEK_SET);
             if ( fwrite((char *)&section_header, sizeof(section_header), 1, fp) != 1)
             {

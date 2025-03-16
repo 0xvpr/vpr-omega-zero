@@ -22,6 +22,7 @@
 #include "elf.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 static const char* filenames[4096];
 static size_t n_filenames;
@@ -42,13 +43,36 @@ int main(int argc, char** argv)
             {
                 switch (argv[i][j])
                 {
-                case 'a': flags.zero_all      = 1; break;
-                case 'n': flags.zero_names    = 1; break;
-                case 's': flags.zero_sections = 1; break;
-                case 'H': flags.zero_headers  = 1; break;
-                case 'h': __usage_error(argv[0], "display help"); break;
-                //case '-':
-                default:  fprintf(stderr, "unknown option: %c\n", argv[i][j]); break;
+                    case 'H': flags.zero_headers           = 1; break;
+                    case 'o': flags.zero_optional_headers  = 1; break;
+                    case 's': flags.zero_section_headers   = 1; break;
+                    case 'a': flags.zero_all               = 1; break;
+                    case 'h': __usage_error(argv[0], "display help"); break;
+                    case '-':
+                    {
+                        if (strncmp((argv[i]+j), "-help", sizeof("-help")) == 0)
+                        {
+                            __usage_error(argv[0], "display help");
+                        }
+                        else if (strncmp((argv[i]+j), "-headers", sizeof("-headers")) == 0)
+                        {
+                            flags.zero_headers = 1;
+                        }
+                        else if (strncmp((argv[i]+j), "-optional-headers", sizeof("-optional-headers")) == 0)
+                        {
+                            flags.zero_headers = 1;
+                        }
+                        else if (strncmp((argv[i]+j), "-section-headers", sizeof("-section-headers")) == 0)
+                        {
+                            flags.zero_headers = 1;
+                        }
+                        else if (strncmp((argv[i]+j), "-all", sizeof("-all")) == 0)
+                        {
+                            flags.zero_headers = 1;
+                        }
+                        break;
+                    }
+                    default:  fprintf(stderr, "unknown option: %c\n", argv[i][j]); break;
                 }
             }
         }
@@ -60,7 +84,7 @@ int main(int argc, char** argv)
     }
 
     // Default to zero_all if none are set
-    if ( !(flags.zero_headers | flags.zero_names | flags.zero_sections) )
+    if ( !(flags.zero_headers | flags.zero_section_headers | flags.zero_optional_headers) )
     {
         flags.zero_all = 1;
     }
@@ -109,13 +133,13 @@ int main(int argc, char** argv)
             case elf_x86:
             {
                 fputs("ELF x86 detected\n", stdout);
-                bSuccess = process_elf32(filename, &flags);
+                bSuccess = process_elf(filename, &flags, elf_x86);
                 break;
             }
             case elf_x86_64:
             {
                 fputs("ELF x86_64 detected\n", stdout);
-                bSuccess = process_elf64(filename, &flags);
+                bSuccess = process_elf(filename, &flags, elf_x86_64);
                 break;
             }
         }
