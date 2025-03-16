@@ -4,9 +4,7 @@
 static
 uint16_t determine_pe32_architecture(FILE* fp)
 {
-    const size_t size = sizeof(MsDosStub) +
-        sizeof(Pe32Header) + sizeof(Pe32OptionalHeader);
-    char header[size];
+    char header[sizeof(MsDosStub) + sizeof(Pe32Header) + sizeof(Pe32OptionalHeader)] = { 0 };
 
     fseek(fp, 0, SEEK_SET);
     if ( fread(header, sizeof(header), 1, fp) != 1 )
