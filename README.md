@@ -14,7 +14,7 @@
 This project aims to provide a tool for the stripping of the  
 section-header information of 32/64 bit ELF and PE32 executables.
 
-## Building with a Docker Environment
+## Building with Docker (recommended)
 ```
 # Download repo
 git clone https://github.com/0xvpr/vpr-omega-zero
@@ -27,8 +27,8 @@ chmod +x docker-build.sh && ./docker-build.sh
 ## Build instructions (local)
 Windows/Linux/WSL/MSYS/macOS
 ```bash
-git clone https://github.com/0xvpr/vpr-bin2fmt vpr-bin2fmt
-cd vpr-bin2fmt
+git clone https://github.com/0xvpr/vpr-omega-zero vpr-omega-zero
+cd vpr-omega-zero
 cmake -B build
 cmake --build build
 ```
@@ -61,7 +61,5 @@ Author:
   VPR
 ```
 
-## Testing TODO
-```bash
-# chmod +x compare.sh && ./compare.sh # deprecated
-```
+#### Testing
+[ TODO ]
