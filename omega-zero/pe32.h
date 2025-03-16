@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "filetypes.h"
 #include "flags.h"
 
 // Structs
@@ -102,19 +103,11 @@ typedef struct _Pe32SectionHeader {
 } Pe32SectionHeader;
 
 /**
- * Perform scraping of 32 bit PE32 binary.
+ * Perform processesing of a 32/64 bit PE32 binary.
  *
  * @param    filename
  * @return   success
 **/
-bool process_pe32(const char* restrict, const flags_ptr_t);
-
-/**
- * Perform scraping of 64 bit PE32+ binary.
- *
- * @param    filename
- * @return   success
-**/
-bool process_pe64(const char* restrict, const flags_ptr_t);
+bool process_pe32(const char* restrict filename, const flags_ptr_t flags, enum filetype_t arch);
 
 #endif // PE_32_HEADER

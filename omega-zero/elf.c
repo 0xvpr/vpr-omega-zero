@@ -21,7 +21,7 @@ bool process_elf32(const char* restrict filename, flags_ptr_t flags)
 
     // Get header information
     fseek(fp, 0, SEEK_SET);
-    unsigned long bytes_read = fread((unsigned char *)&header, sizeof(header), 1, fp);
+    size_t bytes_read = fread((unsigned char *)&header, sizeof(header), 1, fp);
     if (bytes_read != 1) 
     {
         fprintf(stderr, "Failed to read bytes for elf header.\n");
@@ -48,7 +48,7 @@ bool process_elf32(const char* restrict filename, flags_ptr_t flags)
     }
 
     // Overwrite total bytes
-    fseek(fp, header.e_shoff, SEEK_SET);
+    fseek(fp, (long)header.e_shoff, SEEK_SET);
     if ( fwrite(null_bytes, (unsigned long)(shsize), 1, fp) != 1 )
     {
         free(null_bytes);
@@ -93,7 +93,7 @@ bool process_elf64(const char* restrict filename, flags_ptr_t flags)
 
     // Get header information
     fseek(fp, 0, SEEK_SET);
-    unsigned long bytes_read = fread((unsigned char *)&header, sizeof(header), 1, fp);
+    size_t bytes_read = fread((unsigned char *)&header, sizeof(header), 1, fp);
     if (bytes_read != 1) 
     {
         fprintf(stderr, "Failed to read bytes for elf header.\n");

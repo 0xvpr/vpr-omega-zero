@@ -34,7 +34,6 @@ int main(int argc, char** argv)
         __usage_error(argv[0], "insufficient arguments");
     }
 
-    bool use_default = 1;
     for (int i = 1; i < argc; ++i)
     {
         if (argv[i][0] == '-' && argv[i][1])
@@ -43,10 +42,12 @@ int main(int argc, char** argv)
             {
                 switch (argv[i][j])
                 {
-                case 'a': use_default = 0; flags.zero_all      = 1; break;
-                case 's': use_default = 0; flags.zero_sections = 1; break;
-                case 'H': use_default = 0; flags.zero_headers  = 1; break;
-                case 'h': __usage_error(argv[0], "display help");   break;
+                case 'a': flags.zero_all      = 1; break;
+                case 'n': flags.zero_names    = 1; break;
+                case 's': flags.zero_sections = 1; break;
+                case 'H': flags.zero_headers  = 1; break;
+                case 'h': __usage_error(argv[0], "display help"); break;
+                //case '-':
                 default:  fprintf(stderr, "unknown option: %c\n", argv[i][j]); break;
                 }
             }
@@ -58,7 +59,8 @@ int main(int argc, char** argv)
         }
     }
 
-    if (use_default)
+    // Default to zero_all if none are set
+    if ( !(flags.zero_headers | flags.zero_names | flags.zero_sections) )
     {
         flags.zero_all = 1;
     }
@@ -95,13 +97,13 @@ int main(int argc, char** argv)
             case pe_x86:
             {
                 fputs("PE32 detected\n", stdout);
-                bSuccess = process_pe32(filename, &flags);
+                bSuccess = process_pe32(filename, &flags, pe_x86);
                 break;
             }
             case pe_x86_64:
             {
                 fputs("PE32+(x86_64) detected\n", stdout);
-                bSuccess = process_pe64(filename, &flags);
+                bSuccess = process_pe32(filename, &flags, pe_x86_64);
                 break;
             }
             case elf_x86:

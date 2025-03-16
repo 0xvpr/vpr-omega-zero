@@ -16,6 +16,7 @@ void __usage_error(const char* restrict argv_0, const char* restrict error_messa
         "Optional arguments:\n"
         "  -a        Enable all zeros. (default option)\n"
         "  -s        Zero all section headers.\n"
+        "  -n        Zero all section header names.\n"
         "  -H        Zero all headers.\n"
         "\n"
         "Examples:\n"

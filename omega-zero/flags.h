@@ -5,6 +5,7 @@
 
 typedef struct _flags {
     bool zero_headers;
+    bool zero_names;
     bool zero_sections;
     bool zero_all;
 } flags_t, *flags_ptr_t;
