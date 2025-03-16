@@ -1,13 +1,9 @@
 #ifndef UTIL_HEADER
 #define UTIL_HEADER
 
-#include <iostream>
-
 /**
  * Usage error
- *
 **/
-[[noreturn]]
-void __usage_error(char* argv, int error_code);
+void __usage_error(const char* restrict argv, const char* restrict error_message);
 
 #endif // UTIL_HEADER

@@ -37,6 +37,7 @@ venv
 env
 bin
 build
+docker-build
 
 # Exclude Compiled Files
 *.a

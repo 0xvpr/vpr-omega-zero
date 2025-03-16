@@ -16,7 +16,7 @@ jobs:
         run: cmake -B build
 
       - name: Build and link objects
-        run: cmake --build build --config Release
+        run: cmake --build build
 
   windows_latest_build_cmake_msvc:
     runs-on: windows-latest
@@ -42,4 +42,4 @@ jobs:
         run: cmake -B build
 
       - name: Build and link objects
-        run: cmake --build build --config Release
+        run: cmake --build build
